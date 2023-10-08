@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/sword/sword.obj",
+        "texture":"models/sword/sword.png"
+    }
+}

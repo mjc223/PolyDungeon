@@ -19,6 +19,7 @@
 
 #include "entity.h"
 #include "agumon.h"
+#include "sword.h"
 #include "player.h"
 #include "world.h"
 
@@ -34,7 +35,7 @@ int main(int argc,char *argv[])
     //Uint32 then;
     float mouseFrame = 0;
     World *w;
-    Entity *agu;
+    Entity *agu, *sword, *potion;
     Particle particle[100];
     Matrix4 skyMat;
     Model *sky;
@@ -62,7 +63,10 @@ int main(int argc,char *argv[])
     
     
     agu = agumon_new(vector3d(0 ,0,0));
+    sword = sword_new(vector3d(10, 10, 10));
+    potion = potion_new(vector3d(20, 20, 20));
     if (agu)agu->selected = 1;
+    
     w = world_load("config/testworld.json");
     
     SDL_SetRelativeMouseMode(SDL_TRUE);

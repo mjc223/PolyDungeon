@@ -65,7 +65,7 @@ void player_think(Entity *self)
         vector3d_add(self->position,self->position,-right);
     }
     if (keys[SDL_SCANCODE_SPACE])self->position.z += 1;
-    if (keys[SDL_SCANCODE_Z])self->position.z -= 1;
+    if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1;
     
     if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0050;
     if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0050;
