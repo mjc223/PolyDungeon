@@ -10,5 +10,9 @@
  */
 Entity *agumon_new(Vector3D position);
 
+void agumon_update(Entity *self);
+
+void agumon_think(Entity *self);
+
 
 #endif

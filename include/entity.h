@@ -4,6 +4,7 @@
 #include "gfc_types.h"
 #include "gfc_color.h"
 #include "gfc_primitives.h"
+#include "gfc_shape.h"
 
 #include "gf3d_model.h"
 
@@ -47,6 +48,13 @@ typedef struct Entity_S
     
     Uint32      health;     /**<entity dies when it reaches zero*/
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
+    PrimitiveTypes  *prim;
+
+
+    Sphere sp;
+
+    // BEGIN POLY DUNGEON
+    
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
     
     void *customData;   /**<IF an entity needs to keep track of extra data, we can do it here*/

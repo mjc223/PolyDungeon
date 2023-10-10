@@ -19,7 +19,8 @@
 
 #include "entity.h"
 #include "agumon.h"
-#include "sword.h"
+#include "potion.h"
+
 #include "player.h"
 #include "world.h"
 
@@ -35,7 +36,7 @@ int main(int argc,char *argv[])
     //Uint32 then;
     float mouseFrame = 0;
     World *w;
-    Entity *agu, *sword, *potion;
+    Entity *agu, *potion;
     Particle particle[100];
     Matrix4 skyMat;
     Model *sky;
@@ -61,11 +62,11 @@ int main(int argc,char *argv[])
     
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     
-    
-    agu = agumon_new(vector3d(0 ,0,0));
-    sword = sword_new(vector3d(10, 10, 10));
+    agu = agumon_new(vector3d(5, 0, 0));
     potion = potion_new(vector3d(20, 20, 20));
+
     if (agu)agu->selected = 1;
+    if (potion) potion->selected = 1;
     
     w = world_load("config/testworld.json");
     

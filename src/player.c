@@ -8,25 +8,30 @@ static int thirdPersonMode = 0;
 void player_think(Entity *self);
 void player_update(Entity *self);
 
+Entity *plr;
+
 Entity *player_new(Vector3D position)
 {
-    Entity *ent = NULL;
+    plr = NULL;
     
-    ent = entity_new();
-    if (!ent)
+    plr = entity_new();
+    if (!plr)
     {
         slog("UGH OHHHH, no player for you!");
         return NULL;
     }
     
-    ent->model = gf3d_model_load("models/dino.model");
-    ent->think = player_think;
-    ent->update = player_update;
-    vector3d_copy(ent->position,position);
-    ent->rotation.x = -GFC_PI;
-    ent->rotation.z = -GFC_HALF_PI;
-    ent->hidden = 1;
-    return ent;
+    plr->model = gf3d_model_load("models/dino.model");
+    plr->think = player_think;
+    plr->update = player_update;
+    vector3d_copy(plr->position,position);
+    plr->rotation.x = -GFC_PI;
+    plr->rotation.z = -GFC_HALF_PI;
+    plr->hidden = 1;
+
+    plr->sp = gfc_sphere(plr->position.x, plr->position.y, plr->position.z, 10);    
+
+    return plr;
 }
 
 
@@ -93,6 +98,12 @@ void player_update(Entity *self)
     
     vector3d_copy(position,self->position);
     vector3d_copy(rotation,self->rotation);
+
+    self->sp.x = self->position.x;
+    self->sp.y = self->position.y;
+    self->sp.z = self->position.z;
+
+
     if (thirdPersonMode)
     {
         position.z += 100;
@@ -102,8 +113,14 @@ void player_update(Entity *self)
         forward.y = w.y * 100;
         vector3d_add(position,position,-forward);
     }
+    
     gf3d_camera_set_position(position);
     gf3d_camera_set_rotation(rotation);
+}
+
+Sphere get_player_sphere()
+{
+    return plr->sp;
 }
 
 /*eol@eof*/

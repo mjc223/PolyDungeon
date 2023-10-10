@@ -1,5 +1,5 @@
 #include "simple_logger.h"
-#include "sword.h"
+#include "potion.h"
 
 
 void potion_update(Entity *self);
