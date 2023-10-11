@@ -6,6 +6,8 @@
 #include "gfc_primitives.h"
 #include "gfc_shape.h"
 
+#include "collider.h"
+
 #include "gf3d_model.h"
 
 typedef enum
@@ -50,6 +52,7 @@ typedef struct Entity_S
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     PrimitiveTypes  *prim;
 
+    Collider *col;
 
     Sphere sp;
 

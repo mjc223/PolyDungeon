@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "gfc_primitives.h": "c"
+        "gfc_primitives.h": "c",
+        "gf2d_sprite.h": "c",
+        "gf3d_texture.h": "c",
+        "gf3d_swapchain.h": "c",
+        "simple_logger.h": "c",
+        "entity.h": "c"
     }
 }
