@@ -62,7 +62,7 @@ int main(int argc,char *argv[])
     
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     
-    agu = agumon_new(vector3d(0, 0, 0));
+    agu = agumon_new(vector3d(5, 5, 5));
     potion = potion_new(vector3d(20, 20, 20));
 
     if (agu)agu->selected = 1;

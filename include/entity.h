@@ -52,7 +52,7 @@ typedef struct Entity_S
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     PrimitiveTypes  *prim;
 
-    Collider *col;
+    Collider col;
 
     Sphere sp;
 

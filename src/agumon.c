@@ -23,8 +23,9 @@ Entity *agumon_new(Vector3D position)
 
     vector3d_copy(ent->position,position);
 
-    Collider *col = collider_sphere_new(ent->position, gfc_sphere(ent->position.x, ent->position.y, ent->position.z, 10), 1);
+    Collider col = collider_sphere_new(ent->position, gfc_sphere(ent->position.x, ent->position.y, ent->position.z, 10), 1);
     ent->col = col;
+    
 
     return ent;
 }
@@ -38,9 +39,9 @@ void agumon_update(Entity *self)
     }
     vector3d_add(self->position,self->position,self->velocity);
     
-    self->col->s.x = self->position.x;
-    self->col->s.y = self->position.y;
-    self->col->s.z = self->position.z;
+    self->col.s.x = self->position.x;
+    self->col.s.y = self->position.y;
+    self->col.s.z = self->position.z;
 
     self->rotation.z += 0.01;
 }
@@ -64,7 +65,7 @@ void agumon_think(Entity *self)
             break;
     }
 
-    if(gfc_sphere_overlap(self->col->s, get_player_sphere()))
+    if(gfc_sphere_overlap(self->col.s, get_player_sphere()))
     {
         slog("COLLISION DETECTED");
     }

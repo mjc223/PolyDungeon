@@ -28,7 +28,7 @@ typedef struct Collider
  * @param isTrigger used to determine if this should be wall
  * @return NULL on error or a valid collider pointer otherwise
  */
-Collider *collider_sphere_new(Vector3D vect, Sphere s, int isTrigger);
+Collider collider_sphere_new(Vector3D vect, Sphere s, int isTrigger);
 
 /**
  * @brief provide a pointer to a new empty sphere collider
@@ -37,7 +37,7 @@ Collider *collider_sphere_new(Vector3D vect, Sphere s, int isTrigger);
  * @param isTrigger used to determine if this should be wall
  * @return NULL on error or a valid collider pointer otherwise
  */
-Collider *collider_box__new(Vector3D vect, Box b, int isTrigger);
+Collider collider_box__new(Vector3D vect, Box b, int isTrigger);
 
 /**
  * @brief provide a pointer to a new empty sphere collider
@@ -46,6 +46,6 @@ Collider *collider_box__new(Vector3D vect, Box b, int isTrigger);
  * @param isTrigger used to determine if this should be wall
  * @return NULL on error or a valid collider pointer otherwise
  */
-Collider *collider_plane_new(Vector3D vect, Plane3D p, int isTrigger);
+Collider collider_plane_new(Vector3D vect, Plane3D p, int isTrigger);
 
 #endif
