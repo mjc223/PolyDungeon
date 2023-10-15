@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/potion_magic/potion_magic.obj",
+        "texture":"models/potion_magic/potion_magic.png"
+    }
+}

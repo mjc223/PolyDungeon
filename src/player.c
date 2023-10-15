@@ -10,8 +10,17 @@ void player_update(Entity *self);
 
 Entity *plr;
 
+
 Entity *player_new(Vector3D position)
 {
+    PlayerData *pd;
+    pd = gfc_allocate_array(sizeof(PlayerData), 1);
+
+    pd->arrowMult = 1.0;
+    pd->magicMult = 1.0;
+    pd->physicalMult = 1.0;
+    pd->speedMult = 0.5;
+
     plr = NULL;
     
     plr = entity_new();
@@ -29,7 +38,9 @@ Entity *player_new(Vector3D position)
     plr->rotation.z = -GFC_HALF_PI;
     plr->hidden = 1;
 
-    plr->sp = gfc_sphere(plr->position.x, plr->position.y, plr->position.z, 10);    
+    plr->col.s = gfc_sphere(plr->position.x, plr->position.y, plr->position.z, 10);
+    
+    plr->customData = pd;
 
     return plr;
 }
@@ -37,6 +48,7 @@ Entity *player_new(Vector3D position)
 
 void player_think(Entity *self)
 {
+    PlayerData *checkPd = self->customData;
     Vector3D forward = {0};
     Vector3D right = {0};
     Vector2D w,mouse;
@@ -47,12 +59,15 @@ void player_think(Entity *self)
 
     mouse.x = mx;
     mouse.y = my;
+
     w = vector2d_from_angle(self->rotation.z);
-    forward.x = w.x;
-    forward.y = w.y;
+    forward.x = w.x * checkPd->speedMult;
+    forward.y = w.y * checkPd->speedMult;
+
     w = vector2d_from_angle(self->rotation.z - GFC_HALF_PI);
-    right.x = w.x;
-    right.y = w.y;
+    right.x = w.x * checkPd->speedMult;
+    right.y = w.y * checkPd->speedMult;;
+
     if (keys[SDL_SCANCODE_W])
     {   
         vector3d_add(self->position,self->position,forward);
@@ -99,9 +114,9 @@ void player_update(Entity *self)
     vector3d_copy(position,self->position);
     vector3d_copy(rotation,self->rotation);
 
-    self->sp.x = self->position.x;
-    self->sp.y = self->position.y;
-    self->sp.z = self->position.z;
+    self->col.s.x = self->position.x;
+    self->col.s.y = self->position.y;
+    self->col.s.z = self->position.z;
 
 
     if (thirdPersonMode)
@@ -120,7 +135,13 @@ void player_update(Entity *self)
 
 Sphere get_player_sphere()
 {
-    return plr->sp;
+    return plr->col.s;
+}
+
+void change_player_speed(float newMult)
+{
+    PlayerData *pd = plr->customData;
+    pd->speedMult = newMult;
 }
 
 /*eol@eof*/

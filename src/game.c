@@ -36,7 +36,10 @@ int main(int argc,char *argv[])
     //Uint32 then;
     float mouseFrame = 0;
     World *w;
-    Entity *agu, *potion;
+    Entity *agu,
+        *potionAttack, *potionDefense, 
+        *potionHealth, *potionMagic, *potionSpeed;
+
     Particle particle[100];
     Matrix4 skyMat;
     Model *sky;
@@ -62,11 +65,19 @@ int main(int argc,char *argv[])
     
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     
+    //Entities
     agu = agumon_new(vector3d(5, 5, 5));
-    potion = potion_new(vector3d(20, 20, 20));
+
+    //Potions
+    potionAttack = potion_attack_new(vector3d(300, 300, 0));
+    potionDefense = potion_defense_new(vector3d(350, 350, 0));
+    potionHealth = potion_health_new(vector3d(400, 400, 0));
+    potionMagic = potion_magic_new(vector3d(450, 450, 0));
+    potionSpeed = potion_speed_new(vector3d(500, 500, 0));
+    
 
     if (agu)agu->selected = 1;
-    if (potion) potion->selected = 1;
+    if (potionAttack) potionAttack->selected = 1;
     
     w = world_load("config/testworld.json");
     

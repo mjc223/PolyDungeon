@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/potion_health/potion_health.obj",
+        "texture":"models/potion_health/potion_health.png"
+    }
+}

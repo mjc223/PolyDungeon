@@ -10,6 +10,7 @@
 
 #include "gf3d_model.h"
 
+
 typedef enum
 {
     ES_idle = 0,
@@ -54,13 +55,12 @@ typedef struct Entity_S
 
     Collider col;
 
-    Sphere sp;
-
     // BEGIN POLY DUNGEON
     
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
     
     void *customData;   /**<IF an entity needs to keep track of extra data, we can do it here*/
+
 }Entity;
 
 /**

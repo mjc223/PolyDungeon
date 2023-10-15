@@ -67,7 +67,7 @@ void agumon_think(Entity *self)
 
     if(gfc_sphere_overlap(self->col.s, get_player_sphere()))
     {
-        slog("COLLISION DETECTED");
+        slog("AGU: COLLISION DETECTED");
     }
 }
 

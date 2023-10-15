@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/potion_attack/potion_attack.obj",
+        "texture":"models/potion_attack/potion_attack.png"
+    }
+}
