@@ -20,6 +20,8 @@ Entity *player_new(Vector3D position);
 
 Sphere get_player_sphere();
 
+Sphere get_player_sphere_after_move();
+
 void change_player_speed(float newMult);
 
 #endif

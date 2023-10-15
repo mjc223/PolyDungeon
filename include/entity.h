@@ -50,6 +50,7 @@ typedef struct Entity_S
     Vector3D    rotation;
     
     Uint32      health;     /**<entity dies when it reaches zero*/
+    int         isRigidBody;
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     PrimitiveTypes  *prim;
 

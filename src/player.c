@@ -19,7 +19,7 @@ Entity *player_new(Vector3D position)
     pd->arrowMult = 1.0;
     pd->magicMult = 1.0;
     pd->physicalMult = 1.0;
-    pd->speedMult = 0.5;
+    pd->speedMult = 0.2;
 
     plr = NULL;
     
@@ -29,7 +29,8 @@ Entity *player_new(Vector3D position)
         slog("UGH OHHHH, no player for you!");
         return NULL;
     }
-    
+    plr->isRigidBody = 1;
+
     plr->model = gf3d_model_load("models/dino.model");
     plr->think = player_think;
     plr->update = player_update;
@@ -68,6 +69,11 @@ void player_think(Entity *self)
     right.x = w.x * checkPd->speedMult;
     right.y = w.y * checkPd->speedMult;;
 
+    if(!gfc_sphere_overlap(gfc_sphere(5, 5, 5, 15), get_player_sphere_after_move()))
+    {
+        slog("Bad collision, shouldn;t be able to move");
+    }
+
     if (keys[SDL_SCANCODE_W])
     {   
         vector3d_add(self->position,self->position,forward);
@@ -83,7 +89,8 @@ void player_think(Entity *self)
     if (keys[SDL_SCANCODE_A])    
     {
         vector3d_add(self->position,self->position,-right);
-    }
+    }         
+
     if (keys[SDL_SCANCODE_SPACE])self->position.z += 1;
     if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1;
     
@@ -110,7 +117,14 @@ void player_update(Entity *self)
     Vector2D w;
     
     if (!self)return;
-    
+
+    /*
+    if(gfc_sphere_overlap(gfc_sphere(5, 5, 5, 15), get_player_sphere_after_move()))
+    {
+        slog("Bad collision, shouldn;t be able to move");
+    }
+    */
+
     vector3d_copy(position,self->position);
     vector3d_copy(rotation,self->rotation);
 
@@ -136,6 +150,18 @@ void player_update(Entity *self)
 Sphere get_player_sphere()
 {
     return plr->col.s;
+}
+
+Sphere get_player_sphere_after_move()
+{
+    Sphere s = {0};
+    s = plr->col.s;
+
+    s.x += plr->velocity.x;
+    s.y += plr->velocity.y;
+    s.z += plr->velocity.z;
+
+    return s;
 }
 
 void change_player_speed(float newMult)

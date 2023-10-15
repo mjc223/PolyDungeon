@@ -23,6 +23,7 @@ void entity_system_close()
     }
     free(entity_manager.entity_list);
     memset(&entity_manager,0,sizeof(EntityManager));
+
     slog("entity_system closed");
 }
 
@@ -37,6 +38,8 @@ void entity_system_init(Uint32 maxEntities)
     entity_manager.entity_count = maxEntities;
     atexit(entity_system_close);
     slog("entity_system initialized");
+
+
 }
 
 Entity *entity_new()
@@ -101,6 +104,7 @@ void entity_draw_all()
 void entity_think(Entity *self)
 {
     if (!self)return;
+
     if (self->think)self->think(self);
 }
 
@@ -113,6 +117,7 @@ void entity_think_all()
         {
             continue;// skip this iteration of the loop
         }
+            
         entity_think(&entity_manager.entity_list[i]);
     }
 }
@@ -122,7 +127,7 @@ void entity_update(Entity *self)
 {
     if (!self)return;
     // HANDLE ALL COMMON UPDATE STUFF
-    
+
     vector3d_add(self->position,self->position,self->velocity);
     vector3d_add(self->velocity,self->acceleration,self->velocity);
     

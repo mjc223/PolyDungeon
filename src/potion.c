@@ -206,10 +206,6 @@ void potion_think(Entity *self)
         entity_free(self);
     }
 
-
-
-
-
 }
 
 /*eol@eof*/
