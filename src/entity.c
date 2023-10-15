@@ -148,4 +148,18 @@ void entity_update_all()
     }
 }
 
+Collider get_collider_after_move(Entity *self)
+{
+    Collider col = {0};
+    if (!self)return col;
+    
+    //gfc_shape_copy(&col.s,self->col.s);
+    //gfc_shape_move(&col.s,self->col.s);
+    //gfc_shape_move(&shape,self->velocity);
+
+
+    return col;
+}
+
+
 /*eol@eof*/
