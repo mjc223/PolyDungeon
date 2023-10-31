@@ -10,6 +10,7 @@ void player_update(Entity *self);
 
 Entity *plr;
 
+Vector3D nextPos;
 
 Entity *player_new(Vector3D position)
 {
@@ -19,7 +20,7 @@ Entity *player_new(Vector3D position)
     pd->arrowMult = 1.0;
     pd->magicMult = 1.0;
     pd->physicalMult = 1.0;
-    pd->speedMult = 0.2;
+    pd->speedMult = 0.05;
 
     plr = NULL;
     
@@ -39,7 +40,7 @@ Entity *player_new(Vector3D position)
     plr->rotation.z = -GFC_HALF_PI;
     plr->hidden = 1;
 
-    plr->col.s = gfc_sphere(plr->position.x, plr->position.y, plr->position.z, 10);
+    plr->col.s = gfc_sphere(plr->position.x, plr->position.y, plr->position.z, 3);
     
     plr->customData = pd;
 
@@ -64,32 +65,41 @@ void player_think(Entity *self)
     w = vector2d_from_angle(self->rotation.z);
     forward.x = w.x * checkPd->speedMult;
     forward.y = w.y * checkPd->speedMult;
-
     w = vector2d_from_angle(self->rotation.z - GFC_HALF_PI);
+
+
     right.x = w.x * checkPd->speedMult;
     right.y = w.y * checkPd->speedMult;;
 
-    if(!gfc_sphere_overlap(gfc_sphere(5, 5, 5, 15), get_player_sphere_after_move()))
-    {
-        slog("Bad collision, shouldn;t be able to move");
-    }
+    if (keys[SDL_SCANCODE_W]) vector3d_add(nextPos, nextPos, forward);
+    if (keys[SDL_SCANCODE_S]) vector3d_add(nextPos, nextPos, -forward);
+    if (keys[SDL_SCANCODE_D]) vector3d_add(nextPos, nextPos, right);
+    if (keys[SDL_SCANCODE_A]) vector3d_add(nextPos, nextPos, -right);
+    
 
-    if (keys[SDL_SCANCODE_W])
-    {   
-        vector3d_add(self->position,self->position,forward);
-    }
-    if (keys[SDL_SCANCODE_S])
+    if(gfc_sphere_overlap(gfc_sphere(5, 0, 5, 50), get_player_sphere_after_move()))
     {
-        vector3d_add(self->position,self->position,-forward);        
+        slog("Bad collision, shouldnt be able to move");
     }
-    if (keys[SDL_SCANCODE_D])
+    else
     {
-        vector3d_add(self->position,self->position,right);
+        if (keys[SDL_SCANCODE_W])
+        {   
+            vector3d_add(self->position,self->position,forward);
+        }
+        if (keys[SDL_SCANCODE_S])
+        {
+            vector3d_add(self->position,self->position,-forward);        
+        }
+        if (keys[SDL_SCANCODE_D])
+        {
+            vector3d_add(self->position,self->position,right);
+        }
+        if (keys[SDL_SCANCODE_A])    
+        {
+            vector3d_add(self->position,self->position,-right);
+        }         
     }
-    if (keys[SDL_SCANCODE_A])    
-    {
-        vector3d_add(self->position,self->position,-right);
-    }         
 
     if (keys[SDL_SCANCODE_SPACE])self->position.z += 1;
     if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1;
@@ -152,14 +162,25 @@ Sphere get_player_sphere()
     return plr->col.s;
 }
 
+Vector3D get_player_position()
+{
+    return plr->position;
+}
+
+Vector3D get_player_next_position()
+{
+    return nextPos;
+}
+
 Sphere get_player_sphere_after_move()
 {
     Sphere s = {0};
     s = plr->col.s;
+    Vector3D deltaVect = get_player_next_position();
 
-    s.x += plr->velocity.x;
-    s.y += plr->velocity.y;
-    s.z += plr->velocity.z;
+    s.x += deltaVect.x;
+    s.y += deltaVect.y;
+    s.z += deltaVect.z;
 
     return s;
 }
