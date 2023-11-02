@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include "simple_logger.h"
-
 #include "entity.h"
 
 typedef struct
@@ -13,7 +12,9 @@ typedef struct
 }EntityManager;
 
 static EntityManager entity_manager = {0};
+int entity_collide_check(Entity *self, Entity *other);
 
+Entity *entity_get_collision_entity(Entity *self);
 void entity_system_close()
 {
     int i;
@@ -38,7 +39,6 @@ void entity_system_init(Uint32 maxEntities)
     entity_manager.entity_count = maxEntities;
     atexit(entity_system_close);
     slog("entity_system initialized");
-
 
 }
 
@@ -117,9 +117,46 @@ void entity_think_all()
         {
             continue;// skip this iteration of the loop
         }
-            
         entity_think(&entity_manager.entity_list[i]);
     }
+}
+
+int entity_collide_check(Entity *self, Entity *other)
+{
+    Box A, B;
+    if ((!self) || (!other))
+    {
+        slog("missing entity data for collision check");
+        return 0;
+    }
+    gfc_box_cpy(A, self->bounds);
+    gfc_box_cpy(B, other->bounds);
+    vector3d_add(A, A, self->position);
+    vector3d_add(B, B, other->position);
+    return gfc_box_overlap(A, B);
+}
+
+Entity *entity_get_collision_entity(Entity *self)
+{
+    int i;
+
+    if (!self)
+    {
+        slog ("No self was provided");
+        return NULL;
+    }
+
+    for (i = 0; i < entity_manager.entity_count; i++)
+    {
+        if(!entity_manager.entity_list[i]._inuse) continue;
+        if(self == &entity_manager.entity_list[i]) continue;
+        if(self->parent == &entity_manager.entity_list[i]) continue;
+        if(entity_collide_check(self, &entity_manager.entity_list[i]))
+        {
+            return &entity_manager.entity_list[i];
+        }
+    }
+    return NULL;
 }
 
 

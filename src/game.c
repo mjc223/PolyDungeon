@@ -39,6 +39,7 @@ int main(int argc,char *argv[])
     Entity *agu,
         *potionAttack, *potionDefense, 
         *potionHealth, *potionMagic, *potionSpeed;
+    
 
     Particle particle[100];
     Matrix4 skyMat;
@@ -63,28 +64,31 @@ int main(int argc,char *argv[])
     
     entity_system_init(1024);
     
+    
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     
     //Entities
-    agu = agumon_new(vector3d(5, 5, 5));
+    agu = agumon_new(vector3d(100, 100, 100));
 
     //Potions
-    potionAttack = potion_attack_new(vector3d(300, 300, 0));
-    potionDefense = potion_defense_new(vector3d(350, 350, 0));
-    potionHealth = potion_health_new(vector3d(400, 400, 0));
-    potionMagic = potion_magic_new(vector3d(450, 450, 0));
-    potionSpeed = potion_speed_new(vector3d(500, 500, 0));
+    //potionAttack = potion_attack_new(vector3d(300, 300, 0));
+    //potionDefense = potion_defense_new(vector3d(350, 350, 0));
+    //potionHealth = potion_health_new(vector3d(400, 400, 0));
+    //potionMagic = potion_magic_new(vector3d(450, 450, 0));
+    //potionSpeed = potion_speed_new(vector3d(500, 500, 0));
     
 
     if (agu)agu->selected = 1;
-    if (potionAttack) potionAttack->selected = 1;
+    //if (potionAttack) potionAttack->selected = 1;
     
     w = world_load("config/testworld.json");
     
+    slog("After world load");
+
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(-50,0,0));
+    Entity *plr = player_new(vector3d(0,0,0));
     
     for (a = 0; a < 100; a++)
     {

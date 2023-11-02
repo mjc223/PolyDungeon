@@ -20,6 +20,15 @@ typedef enum
 }EntityState;
 
 
+typedef enum
+{
+    ENT_WALL = 0,
+    ENT_ITEM,
+    ENT_INTERACT,
+    ENT_NPC,
+    ENT_PROJ
+}EntityType;
+
 typedef struct Entity_S
 {
     Uint8       _inuse;     /**<keeps track of memory usage*/
@@ -41,6 +50,7 @@ typedef struct Entity_S
     void       (*onDeath)(struct Entity_S *self); /**<pointer to an funciton to call when the entity dies*/
     
     EntityState state;
+    EntityType type;
     
     Vector3D    position;  
     Vector3D    velocity;
@@ -54,11 +64,12 @@ typedef struct Entity_S
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     PrimitiveTypes  *prim;
 
-    Collider col;
+    Collider col;    
 
     // BEGIN POLY DUNGEON
     
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
+    struct Entity_S *parent;    /**<entity to target for weapons / ai*/
     
     void *customData;   /**<IF an entity needs to keep track of extra data, we can do it here*/
 
@@ -66,12 +77,8 @@ typedef struct Entity_S
 
 /**
  * @brief initializes the entity subsystem
- * @param maxEntities the limit on number of entities that can exist at the same time
- */
-void entity_system_init(Uint32 maxEntities);
-
-/**
- * @brief provide a pointer to a new empty entity
+ * @param maxEntities the int entity_collide_check(Entity *self, Entity *other)
+Entity *entity_get_collision_entity(Entity *self)r to a new empty entity
  * @return NULL on error or a valid entity pointer otherwise
  */
 Entity *entity_new();
@@ -109,5 +116,11 @@ void entity_think_all();
  * @brief run the update functions for ALL active entities
  */
 void entity_update_all();
+
+int entity_collide_check(Entity *self, Entity *other);
+
+Entity *entity_get_collision_entity(Entity *self);
+
+void entity_system_init(Uint32 maxEntities);
 
 #endif

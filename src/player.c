@@ -10,10 +10,10 @@ void player_update(Entity *self);
 
 Entity *plr;
 
-Vector3D nextPos;
+Vector3D lastPos;
 
 Entity *player_new(Vector3D position)
-{
+{   
     PlayerData *pd;
     pd = gfc_allocate_array(sizeof(PlayerData), 1);
 
@@ -36,11 +36,13 @@ Entity *player_new(Vector3D position)
     plr->think = player_think;
     plr->update = player_update;
     vector3d_copy(plr->position,position);
+    vector3d_copy(lastPos, plr->position);
     plr->rotation.x = -GFC_PI;
     plr->rotation.z = -GFC_HALF_PI;
     plr->hidden = 1;
 
-    plr->col.s = gfc_sphere(plr->position.x, plr->position.y, plr->position.z, 3);
+    Box b = gfc_box(position.x, position.y, position.z, 2.0, 2.0, 2.0);
+    plr->bounds = b;
     
     plr->customData = pd;
 
@@ -54,6 +56,11 @@ void player_think(Entity *self)
     Vector3D forward = {0};
     Vector3D right = {0};
     Vector2D w,mouse;
+
+
+    Entity *other;
+    Bool coll = false;
+
     int mx,my;
     SDL_GetRelativeMouseState(&mx,&my);
     const Uint8 * keys;
@@ -70,16 +77,18 @@ void player_think(Entity *self)
 
     right.x = w.x * checkPd->speedMult;
     right.y = w.y * checkPd->speedMult;;
-
-    if (keys[SDL_SCANCODE_W]) vector3d_add(nextPos, nextPos, forward);
-    if (keys[SDL_SCANCODE_S]) vector3d_add(nextPos, nextPos, -forward);
-    if (keys[SDL_SCANCODE_D]) vector3d_add(nextPos, nextPos, right);
-    if (keys[SDL_SCANCODE_A]) vector3d_add(nextPos, nextPos, -right);
     
+    other = entity_get_collision_entity(self);
 
-    if(gfc_sphere_overlap(gfc_sphere(5, 0, 5, 50), get_player_sphere_after_move()))
+    if (other == NULL)
+        coll = false;
+    else
+        coll = true;
+
+    if(coll && other->type == ENT_WALL)
     {
-        slog("Bad collision, shouldnt be able to move");
+        vector3d_copy(self->position, lastPos);
+        slog("help me");
     }
     else
     {
@@ -98,8 +107,9 @@ void player_think(Entity *self)
         if (keys[SDL_SCANCODE_A])    
         {
             vector3d_add(self->position,self->position,-right);
-        }         
+        }
     }
+             
 
     if (keys[SDL_SCANCODE_SPACE])self->position.z += 1;
     if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1;
@@ -128,19 +138,11 @@ void player_update(Entity *self)
     
     if (!self)return;
 
-    /*
-    if(gfc_sphere_overlap(gfc_sphere(5, 5, 5, 15), get_player_sphere_after_move()))
-    {
-        slog("Bad collision, shouldn;t be able to move");
-    }
-    */
 
     vector3d_copy(position,self->position);
+    vector3d_copy(self->bounds, self->position);
     vector3d_copy(rotation,self->rotation);
-
-    self->col.s.x = self->position.x;
-    self->col.s.y = self->position.y;
-    self->col.s.z = self->position.z;
+    
 
 
     if (thirdPersonMode)
@@ -155,6 +157,8 @@ void player_update(Entity *self)
     
     gf3d_camera_set_position(position);
     gf3d_camera_set_rotation(rotation);
+
+    lastPos = self->position;
 }
 
 Sphere get_player_sphere()
@@ -167,23 +171,6 @@ Vector3D get_player_position()
     return plr->position;
 }
 
-Vector3D get_player_next_position()
-{
-    return nextPos;
-}
-
-Sphere get_player_sphere_after_move()
-{
-    Sphere s = {0};
-    s = plr->col.s;
-    Vector3D deltaVect = get_player_next_position();
-
-    s.x += deltaVect.x;
-    s.y += deltaVect.y;
-    s.z += deltaVect.z;
-
-    return s;
-}
 
 void change_player_speed(float newMult)
 {
