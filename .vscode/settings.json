@@ -6,6 +6,7 @@
         "gf3d_swapchain.h": "c",
         "simple_logger.h": "c",
         "entity.h": "c",
-        "gf3d_model.h": "c"
+        "gf3d_model.h": "c",
+        "__node_handle": "c"
     }
 }

@@ -24,7 +24,8 @@ Entity *agumon_new(Vector3D position)
     ent->isRigidBody = 1;
     ent->type = ENT_WALL;
     
-    Box b = gfc_box(position.x, position.y, position.z, 2.0, 2.0, 2.0);
+    vector3d_copy(ent->position, position);
+    Box b = gfc_box(position.x, position.y, position.z, 20, 20, 20);
     ent->bounds = b;
     
     return ent;

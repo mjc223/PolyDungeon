@@ -68,14 +68,14 @@ int main(int argc,char *argv[])
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     
     //Entities
-    agu = agumon_new(vector3d(100, 100, 100));
+    agu = agumon_new(vector3d(100, 100, 0));
 
     //Potions
-    //potionAttack = potion_attack_new(vector3d(300, 300, 0));
-    //potionDefense = potion_defense_new(vector3d(350, 350, 0));
-    //potionHealth = potion_health_new(vector3d(400, 400, 0));
-    //potionMagic = potion_magic_new(vector3d(450, 450, 0));
-    //potionSpeed = potion_speed_new(vector3d(500, 500, 0));
+    potionAttack = potion_attack_new(vector3d(300, 300, 0));
+    potionDefense = potion_defense_new(vector3d(350, 350, 0));
+    potionHealth = potion_health_new(vector3d(400, 400, 0));
+    potionMagic = potion_magic_new(vector3d(450, 450, 0));
+    potionSpeed = potion_speed_new(vector3d(500, 500, 0));
     
 
     if (agu)agu->selected = 1;
@@ -88,7 +88,7 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    Entity *plr = player_new(vector3d(0,0,0));
+    player_new(vector3d(0,0,0));
     
     for (a = 0; a < 100; a++)
     {
@@ -109,6 +109,7 @@ int main(int argc,char *argv[])
         gfc_input_update();
         gf2d_font_update();
         SDL_GetMouseState(&mousex,&mousey);
+        
         
         mouseFrame += 0.01;
         if (mouseFrame >= 16)mouseFrame = 0;

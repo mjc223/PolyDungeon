@@ -11,6 +11,7 @@ void player_update(Entity *self);
 Entity *plr;
 
 Vector3D lastPos;
+float teleportTimer = 30;
 
 Entity *player_new(Vector3D position)
 {   
@@ -41,7 +42,7 @@ Entity *player_new(Vector3D position)
     plr->rotation.z = -GFC_HALF_PI;
     plr->hidden = 1;
 
-    Box b = gfc_box(position.x, position.y, position.z, 2.0, 2.0, 2.0);
+    Box b = gfc_box(position.x, position.y, position.z, 20, 20, 20);
     plr->bounds = b;
     
     plr->customData = pd;
@@ -59,7 +60,6 @@ void player_think(Entity *self)
 
 
     Entity *other;
-    Bool coll = false;
 
     int mx,my;
     SDL_GetRelativeMouseState(&mx,&my);
@@ -80,18 +80,14 @@ void player_think(Entity *self)
     
     other = entity_get_collision_entity(self);
 
-    if (other == NULL)
-        coll = false;
-    else
-        coll = true;
-
-    if(coll && other->type == ENT_WALL)
+    if(other != NULL && other->type == ENT_WALL)
     {
         vector3d_copy(self->position, lastPos);
-        slog("help me");
     }
     else
-    {
+    {       
+        vector3d_copy(lastPos, self->position);   
+
         if (keys[SDL_SCANCODE_W])
         {   
             vector3d_add(self->position,self->position,forward);
@@ -111,8 +107,8 @@ void player_think(Entity *self)
     }
              
 
-    if (keys[SDL_SCANCODE_SPACE])self->position.z += 1;
-    if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1;
+    if (keys[SDL_SCANCODE_SPACE])self->position.z += 1 * checkPd->speedMult;
+    if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1 * checkPd->speedMult;
     
     if (keys[SDL_SCANCODE_UP])self->rotation.x -= 0.0050;
     if (keys[SDL_SCANCODE_DOWN])self->rotation.x += 0.0050;
@@ -157,8 +153,6 @@ void player_update(Entity *self)
     
     gf3d_camera_set_position(position);
     gf3d_camera_set_rotation(rotation);
-
-    lastPos = self->position;
 }
 
 Sphere get_player_sphere()
