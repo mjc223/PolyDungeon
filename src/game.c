@@ -36,9 +36,9 @@ int main(int argc,char *argv[])
     //Uint32 then;
     float mouseFrame = 0;
     World *w;
-    Entity *agu,
-        *potionAttack, *potionDefense, 
-        *potionHealth, *potionMagic, *potionSpeed;
+    Entity *agu, 
+        *potionHealth,
+        *plr;
     
 
     Particle particle[100];
@@ -71,11 +71,11 @@ int main(int argc,char *argv[])
     agu = agumon_new(vector3d(100, 100, 0));
 
     //Potions
-    potionAttack = potion_attack_new(vector3d(300, 300, 0));
-    potionDefense = potion_defense_new(vector3d(350, 350, 0));
+    //potionAttack = potion_attack_new(vector3d(300, 300, 0));
+    //potionDefense = potion_defense_new(vector3d(350, 350, 0));
     potionHealth = potion_health_new(vector3d(400, 400, 0));
-    potionMagic = potion_magic_new(vector3d(450, 450, 0));
-    potionSpeed = potion_speed_new(vector3d(500, 500, 0));
+    //potionMagic = potion_magic_new(vector3d(450, 450, 0));
+    //potionSpeed = potion_speed_new(vector3d(500, 500, 0));
     
 
     if (agu)agu->selected = 1;
@@ -88,7 +88,7 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    player_new(vector3d(0,0,0));
+    plr = player_new(vector3d(0,0,0));
     
     for (a = 0; a < 100; a++)
     {
@@ -131,11 +131,40 @@ int main(int argc,char *argv[])
                     gf3d_particle_draw(&particle[a]);
                 }
             //2D draws
-                gf2d_draw_rect_filled(gfc_rect(10 ,10,1000,32),gfc_color8(128,128,128,255));
+                gf2d_draw_rect_filled(gfc_rect(10,10,1000,32),gfc_color8(128,128,128,255));
                 gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
                 
-                gf2d_draw_rect(gfc_rect(10 ,10,1000,32),gfc_color8(255,255,255,255));
+                gf2d_draw_rect_filled(gfc_rect(10,100,300,32),gfc_color8(60,60,60,255));
+                char buffer[50];
+                int max_len = sizeof buffer;
+                snprintf(buffer, max_len, "Health: %d / %d", plr->currHealth, plr->maxHealth);
+                gf2d_font_draw_line_tag(buffer,FT_H1,gfc_color(1,1,1,1), vector2d(10,100));
                 
+                
+                gf2d_draw_rect_filled(gfc_rect(10,200,800,32),gfc_color8(60,60,60,255));
+                char buffer2[100];
+                int max_len2 = sizeof buffer2;
+                PlayerData *playData;
+                playData = plr->customData;
+                snprintf(buffer2, max_len2, "Phys Attack Mult: %f, Arrow Attack Mult: %f",
+                    playData->physicalMult, playData->arrowMult);
+                gf2d_font_draw_line_tag(buffer2,FT_H1,gfc_color(1,1,1,1), vector2d(10,200));
+
+                gf2d_draw_rect_filled(gfc_rect(10,300,400,32),gfc_color8(60,60,60,255));
+                char buffer_speed[50];
+                int max_len_speed = sizeof buffer_speed;
+                snprintf(buffer_speed, max_len_speed, "Speed %f ",
+                    playData->speedMult);
+                gf2d_font_draw_line_tag(buffer_speed,FT_H1,gfc_color(1,1,1,1), vector2d(10,300));
+
+                gf2d_draw_rect_filled(gfc_rect(10, 400, 300,32),gfc_color8(60,60,60,255));
+                char buffer_mana[50];
+                int max_len_mana = sizeof buffer_mana;
+                snprintf(buffer_mana, max_len_mana, "Mana %d / %d",
+                    playData->currMana, playData->maxMana);
+                gf2d_font_draw_line_tag(buffer_mana,FT_H1,gfc_color(1,1,1,1), vector2d(10,400));
+                
+
                 gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 

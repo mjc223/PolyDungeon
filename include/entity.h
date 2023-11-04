@@ -24,6 +24,7 @@ typedef enum
 {
     ENT_WALL = 0,
     ENT_ITEM,
+    ENT_EQUIPMENT,
     ENT_INTERACT,
     ENT_NPC,
     ENT_PROJ
@@ -59,7 +60,9 @@ typedef struct Entity_S
     Vector3D    scale;
     Vector3D    rotation;
     
-    Uint32      health;     /**<entity dies when it reaches zero*/
+    Uint32      currHealth;     /**<entity dies when it reaches zero*/
+    Uint32      maxHealth;
+    
     int         isRigidBody;
     // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
     PrimitiveTypes  *prim;

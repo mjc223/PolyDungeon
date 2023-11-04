@@ -5,6 +5,12 @@
 
 typedef struct PlayerData
 {
+    int currArrow;
+    int maxArrow;
+
+    int currMana;
+    int maxMana;
+
     float speedMult;
     float physicalMult;
     float magicMult;
@@ -23,5 +29,7 @@ Sphere get_player_sphere();
 Sphere get_player_sphere_after_move();
 
 void change_player_speed(float newMult);
+
+void set_player_data();
 
 #endif
