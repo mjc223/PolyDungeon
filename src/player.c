@@ -221,7 +221,7 @@ void change_player_speed(float newMult)
 
 void set_player_data()
 {
-    plr->currHealth = 10;
+    plr->currHealth = 9;
     plr->maxHealth = 10;
 
     PlayerData *pd;

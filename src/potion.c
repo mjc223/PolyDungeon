@@ -41,6 +41,134 @@ Entity *potion_health_new(Vector3D position)
     return ent;
 }
 
+Entity *potion_cursed_health_new(Vector3D position)
+{
+    PotionData *pd;
+    Entity *ent = NULL;
+    
+    ent = entity_new();
+    if (!ent)
+    {
+        slog("UGH OHHHH, no potion for you!");
+        return NULL;
+    }
+    ent->selectedColor = gfc_color(0.1,1,0.1,1);
+    ent->color = gfc_color(1,1,1,1);
+    ent->model = gf3d_model_load("models/potion_defense.model");
+    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->think = potion_think;
+    ent->update = potion_update;
+    
+    pd = gfc_allocate_array(sizeof(PotionData), 1);
+    pd->pt = PT_Health_Cursed;
+    ent->type = ENT_ITEM;
+
+    ent->customData = pd;
+
+    Box b = gfc_box(position.x, position.y, position.z, 5, 5, 5);
+    ent->bounds = b;
+
+    vector3d_copy(ent->position,position);
+    vector3d_copy(ent->bounds, ent->position);
+    return ent;
+}
+
+Entity *potion_damage_new(Vector3D position)
+{
+    PotionData *pd;
+    Entity *ent = NULL;
+    
+    ent = entity_new();
+    if (!ent)
+    {
+        slog("UGH OHHHH, no potion for you!");
+        return NULL;
+    }
+    ent->selectedColor = gfc_color(0.1,1,0.1,1);
+    ent->color = gfc_color(1,1,1,1);
+    ent->model = gf3d_model_load("models/potion_attack.model");
+    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->think = potion_think;
+    ent->update = potion_update;
+    
+    pd = gfc_allocate_array(sizeof(PotionData), 1);
+    pd->pt = PT_Damage_Boost;
+    ent->type = ENT_ITEM;
+
+    ent->customData = pd;
+
+    Box b = gfc_box(position.x, position.y, position.z, 5, 5, 5);
+    ent->bounds = b;
+
+    vector3d_copy(ent->position,position);
+    vector3d_copy(ent->bounds, ent->position);
+    return ent;
+}
+
+Entity *potion_cursed_damage_new(Vector3D position)
+{
+    PotionData *pd;
+    Entity *ent = NULL;
+    
+    ent = entity_new();
+    if (!ent)
+    {
+        slog("UGH OHHHH, no potion for you!");
+        return NULL;
+    }
+    ent->selectedColor = gfc_color(0.1,1,0.1,1);
+    ent->color = gfc_color(1,1,1,1);
+    ent->model = gf3d_model_load("models/potion_magic.model");
+    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->think = potion_think;
+    ent->update = potion_update;
+    
+    pd = gfc_allocate_array(sizeof(PotionData), 1);
+    pd->pt = PT_Damage_Boost_Cursed;
+    ent->type = ENT_ITEM;
+
+    ent->customData = pd;
+
+    Box b = gfc_box(position.x, position.y, position.z, 5, 5, 5);
+    ent->bounds = b;
+
+    vector3d_copy(ent->position,position);
+    vector3d_copy(ent->bounds, ent->position);
+    return ent;
+}
+
+Entity *potion_speed_new(Vector3D position)
+{
+    PotionData *pd;
+    Entity *ent = NULL;
+    
+    ent = entity_new();
+    if (!ent)
+    {
+        slog("UGH OHHHH, no potion for you!");
+        return NULL;
+    }
+    ent->selectedColor = gfc_color(0.1,1,0.1,1);
+    ent->color = gfc_color(1,1,1,1);
+    ent->model = gf3d_model_load("models/potion_speed.model");
+    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->think = potion_think;
+    ent->update = potion_update;
+    
+    pd = gfc_allocate_array(sizeof(PotionData), 1);
+    pd->pt = PT_Speed;
+    ent->type = ENT_ITEM;
+
+    ent->customData = pd;
+
+    Box b = gfc_box(position.x, position.y, position.z, 5, 5, 5);
+    ent->bounds = b;
+
+    vector3d_copy(ent->position,position);
+    vector3d_copy(ent->bounds, ent->position);
+    return ent;
+}
+
 void potion_think(Entity *self)
 {
     if (!self)return;

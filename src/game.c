@@ -37,7 +37,9 @@ int main(int argc,char *argv[])
     float mouseFrame = 0;
     World *w;
     Entity *agu, 
-        *potionHealth,
+        *potionHealth, *potionCursedHealth,
+        *potionDamage, *potionCursedDamage,
+        *potionSpeed,
         *plr;
     
 
@@ -71,11 +73,11 @@ int main(int argc,char *argv[])
     agu = agumon_new(vector3d(100, 100, 0));
 
     //Potions
-    //potionAttack = potion_attack_new(vector3d(300, 300, 0));
-    //potionDefense = potion_defense_new(vector3d(350, 350, 0));
     potionHealth = potion_health_new(vector3d(400, 400, 0));
-    //potionMagic = potion_magic_new(vector3d(450, 450, 0));
-    //potionSpeed = potion_speed_new(vector3d(500, 500, 0));
+    potionCursedHealth = potion_cursed_health_new(vector3d(450, 450, 0));
+    potionDamage = potion_damage_new(vector3d(500, 500, 0));
+    potionCursedDamage = potion_cursed_damage_new(vector3d(550, 500, 0));
+    potionSpeed = potion_speed_new(vector3d(600, 600, 0));
     
 
     if (agu)agu->selected = 1;
