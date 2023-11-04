@@ -62,12 +62,10 @@ typedef struct Entity_S
     
     Uint32      currHealth;     /**<entity dies when it reaches zero*/
     Uint32      maxHealth;
-    
-    int         isRigidBody;
-    // WHATEVER ELSE WE MIGHT NEED FOR ENTITIES
-    PrimitiveTypes  *prim;
 
-    Collider col;    
+    int         isRigidBody;
+
+    int         isCrouching;
 
     // BEGIN POLY DUNGEON
     

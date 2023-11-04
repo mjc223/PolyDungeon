@@ -34,6 +34,7 @@ Entity *player_new(Vector3D position)
     plr->rotation.x = -GFC_PI;
     plr->rotation.z = -GFC_HALF_PI;
     plr->hidden = 1;
+    plr->isCrouching = 0;
 
     Box b = gfc_box(position.x, position.y, position.z, 20, 20, 20);
     plr->bounds = b;
@@ -160,7 +161,7 @@ void player_think(Entity *self)
             vector3d_add(self->position,self->position,-right);
         }
         if (keys[SDL_SCANCODE_SPACE])self->position.z += 1 * checkPd->speedMult;
-        if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1 * checkPd->speedMult;
+        if (keys[SDL_SCANCODE_LCTRL])self->isCrouching = 1; else self->isCrouching = 0;
     }
              
     if (mouse.x != 0)self->rotation.z -= (mouse.x * 0.001);
@@ -199,13 +200,20 @@ void player_update(Entity *self)
         vector3d_add(position,position,-forward);
     }
     
-    gf3d_camera_set_position(position);
-    gf3d_camera_set_rotation(rotation);
-}
 
-Sphere get_player_sphere()
-{
-    return plr->col.s;
+    if(self->isCrouching == 1)
+    {
+        Vector3D crouchVect;
+        vector3d_copy(crouchVect, position);
+        crouchVect.z -= 10;
+        
+        gf3d_camera_set_position(crouchVect);
+    }
+    else
+    {
+        gf3d_camera_set_position(position);
+    }
+    gf3d_camera_set_rotation(rotation);
 }
 
 Vector3D get_player_position()
