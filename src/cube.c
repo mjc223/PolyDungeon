@@ -19,13 +19,13 @@ Entity *cube_new(Vector3D position)
     ent->model = gf3d_model_load("models/cube.model");
     ent->think = cube_think;
     ent->update = cube_update;
-    ent->scale = vector3d(5000, 5000, 5.0);
+    ent->scale = vector3d(5000, 5000, 0.5);
 
     ent->isRigidBody = 1;
     ent->type = ENT_WALL;
 
     vector3d_copy(ent->position, position);
-    Box b = gfc_box(position.x, position.y, position.z, 5000, 5000, 5);
+    Box b = gfc_box(position.x, position.y, position.z, 5000, 5000, 0.5);
     ent->bounds = b;
     
     return ent;

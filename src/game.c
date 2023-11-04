@@ -74,7 +74,7 @@ int main(int argc,char *argv[])
     playerFace = gf2d_sprite_load("images/playerFace.png", 120, 120, 1);
     
     //Entities
-    agu = agumon_new(vector3d(100, 100, 0));
+    agu = agumon_new(vector3d(100, 100, 20));
     cube = cube_new(vector3d(0, 0, -5));
     //Potions
     potionHealth = potion_health_new(vector3d(400, 400, 15));

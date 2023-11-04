@@ -37,7 +37,7 @@ Entity *player_new(Vector3D position)
     plr->isCrouching = 0;
     plr->isGrounded = 0;
 
-    Box b = gfc_box(position.x, position.y, position.z, 20, 20, 20);
+    Box b = gfc_box(position.x, position.y, position.z, 20, 20, 50);
     plr->bounds = b;
 
     set_player_data();
@@ -87,7 +87,7 @@ void player_think(Entity *self)
         
     }
 
-            if(other != NULL)
+    if(other != NULL)
         {
             switch(other->type)
             {
@@ -164,7 +164,7 @@ void player_think(Entity *self)
         
         if (keys[SDL_SCANCODE_SPACE] && self->isGrounded)
         {
-            vector3d_add(self->position, self->position, vector3d(0, 0, 30));
+            vector3d_add(self->position, self->position, vector3d(0, 0, 40));
             self->isGrounded = 0;
         }
         //if (keys[SDL_SCANCODE_SPACE])self->position.z += 1 * checkPd->speedMult;
@@ -173,9 +173,9 @@ void player_think(Entity *self)
 
         
         //Gravity function
-        if(self->position.z > -2.4)
+        if(self->position.z > 5)
         {
-            vector3d_add(self->position, self->position, vector3d(0, 0, -0.10));
+            vector3d_add(self->position, self->position, vector3d(0, 0, -0.25));
         }
         else
             self->isGrounded = 1;
@@ -221,12 +221,12 @@ void player_update(Entity *self)
     vector3d_copy(cameraVect, position);
     if(self->isCrouching == 1)
     {
-        cameraVect.z += 5;
+        cameraVect.z += 10;
         gf3d_camera_set_position(cameraVect);
     }
     else
     {
-        cameraVect.z += 10;
+        cameraVect.z += 20;
         gf3d_camera_set_position(cameraVect);
     }
     gf3d_camera_set_rotation(rotation);
