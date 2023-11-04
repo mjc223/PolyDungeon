@@ -129,7 +129,7 @@ Entity *potion_cursed_damage_new(Vector3D position)
 
     ent->customData = pd;
 
-    Box b = gfc_box(position.x, position.y, position.z, 5, 5, 5);
+    Box b = gfc_box(position.x, position.y, position.z, 5, 5, 25);
     ent->bounds = b;
 
     vector3d_copy(ent->position,position);

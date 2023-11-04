@@ -19,6 +19,7 @@
 
 #include "entity.h"
 #include "agumon.h"
+#include "cube.h"
 #include "potion.h"
 
 #include "player.h"
@@ -32,11 +33,13 @@ int main(int argc,char *argv[])
     int a;
     
     Sprite *mouse = NULL;
+    Sprite *playerFace = NULL;
+
     int mousex,mousey;
     //Uint32 then;
     float mouseFrame = 0;
     World *w;
-    Entity *agu, 
+    Entity *agu, *cube,
         *potionHealth, *potionCursedHealth,
         *potionDamage, *potionCursedDamage,
         *potionSpeed,
@@ -68,19 +71,21 @@ int main(int argc,char *argv[])
     
     
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
+    playerFace = gf2d_sprite_load("images/playerFace.png", 120, 120, 1);
     
     //Entities
     agu = agumon_new(vector3d(100, 100, 0));
-
+    cube = cube_new(vector3d(0, 0, -5));
     //Potions
-    potionHealth = potion_health_new(vector3d(400, 400, 0));
-    potionCursedHealth = potion_cursed_health_new(vector3d(450, 450, 0));
-    potionDamage = potion_damage_new(vector3d(500, 500, 0));
-    potionCursedDamage = potion_cursed_damage_new(vector3d(550, 500, 0));
-    potionSpeed = potion_speed_new(vector3d(600, 600, 0));
+    potionHealth = potion_health_new(vector3d(400, 400, 15));
+    potionCursedHealth = potion_cursed_health_new(vector3d(450, 450, 15));
+    potionDamage = potion_damage_new(vector3d(500, 500, 15));
+    potionCursedDamage = potion_cursed_damage_new(vector3d(550, 500, 15));
+    potionSpeed = potion_speed_new(vector3d(600, 600, 15));
     
 
     if (agu)agu->selected = 1;
+    if (cube)cube->selected = 1;
     //if (potionAttack) potionAttack->selected = 1;
     
     w = world_load("config/testworld.json");
@@ -90,7 +95,7 @@ int main(int argc,char *argv[])
     SDL_SetRelativeMouseMode(SDL_TRUE);
     slog_sync();
     gf3d_camera_set_scale(vector3d(1,1,1));
-    plr = player_new(vector3d(0,0,0));
+    plr = player_new(vector3d(0,0,15));
     
     for (a = 0; a < 100; a++)
     {
@@ -143,29 +148,39 @@ int main(int argc,char *argv[])
                 gf2d_font_draw_line_tag(buffer,FT_H1,gfc_color(1,1,1,1), vector2d(10,100));
                 
                 
-                gf2d_draw_rect_filled(gfc_rect(10,200,800,32),gfc_color8(60,60,60,255));
+                gf2d_draw_rect_filled(gfc_rect(10,125,800,32),gfc_color8(60,60,60,255));
                 char buffer2[100];
                 int max_len2 = sizeof buffer2;
                 PlayerData *playData;
                 playData = plr->customData;
                 snprintf(buffer2, max_len2, "Phys Attack Mult: %f, Arrow Attack Mult: %f",
                     playData->physicalMult, playData->arrowMult);
-                gf2d_font_draw_line_tag(buffer2,FT_H1,gfc_color(1,1,1,1), vector2d(10,200));
+                gf2d_font_draw_line_tag(buffer2,FT_H1,gfc_color(1,1,1,1), vector2d(10,125));
 
-                gf2d_draw_rect_filled(gfc_rect(10,300,400,32),gfc_color8(60,60,60,255));
+                gf2d_draw_rect_filled(gfc_rect(10,150,400,32),gfc_color8(60,60,60,255));
                 char buffer_speed[50];
                 int max_len_speed = sizeof buffer_speed;
                 snprintf(buffer_speed, max_len_speed, "Speed %f ",
                     playData->speedMult);
-                gf2d_font_draw_line_tag(buffer_speed,FT_H1,gfc_color(1,1,1,1), vector2d(10,300));
+                gf2d_font_draw_line_tag(buffer_speed,FT_H1,gfc_color(1,1,1,1), vector2d(10,150));
 
-                gf2d_draw_rect_filled(gfc_rect(10, 400, 300,32),gfc_color8(60,60,60,255));
+                gf2d_draw_rect_filled(gfc_rect(10, 175, 300,32),gfc_color8(60,60,60,255));
                 char buffer_mana[50];
                 int max_len_mana = sizeof buffer_mana;
                 snprintf(buffer_mana, max_len_mana, "Mana %d / %d",
                     playData->currMana, playData->maxMana);
-                gf2d_font_draw_line_tag(buffer_mana,FT_H1,gfc_color(1,1,1,1), vector2d(10,400));
+                gf2d_font_draw_line_tag(buffer_mana,FT_H1,gfc_color(1,1,1,1), vector2d(10,175));
+
+                gf2d_draw_rect_filled(gfc_rect(10, 200, 500,32),gfc_color8(60,60,60,255));
+                char buffer_position[50];
+                int max_len_position = sizeof buffer_position;
+                Vector3D positionVect;
+                positionVect = get_player_position();
+                snprintf(buffer_position, max_len_position, "My Position: X: %f Y: %f Z: %f",
+                positionVect.x, positionVect.y, positionVect.z);
+                gf2d_font_draw_line_tag(buffer_position,FT_H1,gfc_color(1,1,1,1), vector2d(10,200));
                 
+                gf2d_sprite_draw(playerFace, vector2d(1000, 10), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);
 
                 gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();

@@ -35,6 +35,7 @@ Entity *player_new(Vector3D position)
     plr->rotation.z = -GFC_HALF_PI;
     plr->hidden = 1;
     plr->isCrouching = 0;
+    plr->isGrounded = 0;
 
     Box b = gfc_box(position.x, position.y, position.z, 20, 20, 20);
     plr->bounds = b;
@@ -83,10 +84,10 @@ void player_think(Entity *self)
     if(other != NULL && other->type == ENT_WALL)
     {
         vector3d_copy(self->position, lastPos);
+        
     }
-    else
-    {
-        if(other != NULL)
+
+            if(other != NULL)
         {
             switch(other->type)
             {
@@ -160,10 +161,26 @@ void player_think(Entity *self)
         {
             vector3d_add(self->position,self->position,-right);
         }
-        if (keys[SDL_SCANCODE_SPACE])self->position.z += 1 * checkPd->speedMult;
-        if (keys[SDL_SCANCODE_LCTRL])self->isCrouching = 1; else self->isCrouching = 0;
-    }
-             
+        
+        if (keys[SDL_SCANCODE_SPACE] && self->isGrounded)
+        {
+            vector3d_add(self->position, self->position, vector3d(0, 0, 30));
+            self->isGrounded = 0;
+        }
+        //if (keys[SDL_SCANCODE_SPACE])self->position.z += 1 * checkPd->speedMult;
+        //if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1 * checkPd->speedMult;
+        if (keys[SDL_SCANCODE_C])self->isCrouching = 1; else self->isCrouching = 0;
+
+        
+        //Gravity function
+        if(self->position.z > -2.4)
+        {
+            vector3d_add(self->position, self->position, vector3d(0, 0, -0.10));
+        }
+        else
+            self->isGrounded = 1;
+
+    
     if (mouse.x != 0)self->rotation.z -= (mouse.x * 0.001);
     if (mouse.y != 0)self->rotation.x += (mouse.y * 0.001);
 
@@ -200,18 +217,17 @@ void player_update(Entity *self)
         vector3d_add(position,position,-forward);
     }
     
-
+    Vector3D cameraVect;
+    vector3d_copy(cameraVect, position);
     if(self->isCrouching == 1)
     {
-        Vector3D crouchVect;
-        vector3d_copy(crouchVect, position);
-        crouchVect.z -= 10;
-        
-        gf3d_camera_set_position(crouchVect);
+        cameraVect.z += 5;
+        gf3d_camera_set_position(cameraVect);
     }
     else
     {
-        gf3d_camera_set_position(position);
+        cameraVect.z += 10;
+        gf3d_camera_set_position(cameraVect);
     }
     gf3d_camera_set_rotation(rotation);
 }
@@ -244,7 +260,7 @@ void set_player_data()
     pd->arrowMult = 1.0;
     pd->magicMult = 1.0;
     pd->physicalMult = 1.0;
-    pd->speedMult = 0.05;
+    pd->speedMult = 0.15;
 
     plr->customData = pd;
 }
