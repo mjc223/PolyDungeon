@@ -31,6 +31,33 @@ Entity *cube_new(Vector3D position)
     return ent;
 }
 
+Entity *cube_wall_new(Vector3D position)
+{
+    Entity *ent = NULL;
+    
+    ent = entity_new();
+    if (!ent)
+    {
+        slog("UGH OHHHH, no agumon for you!");
+        return NULL;
+    }
+    ent->selectedColor = gfc_color(0.1,1,0.1,1);
+    ent->color = gfc_color(1,1,1,1);
+    ent->model = gf3d_model_load("models/cube.model");
+    ent->think = cube_think;
+    ent->update = cube_update;
+    ent->scale = vector3d(500, 500, 500);
+
+    ent->isRigidBody = 1;
+    ent->type = ENT_WALL;
+
+    vector3d_copy(ent->position, position);
+    Box b = gfc_box(position.x, position.y, position.z, 500, 500, 10000);
+    ent->bounds = b;
+    
+    return ent;
+}
+
 void cube_update(Entity *self)
 {
     if (!self)

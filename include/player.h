@@ -5,6 +5,8 @@
 
 typedef struct PlayerData
 {
+    float defense;
+
     int currArrow;
     int maxArrow;
 

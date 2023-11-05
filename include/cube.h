@@ -10,6 +10,8 @@
  */
 Entity *cube_new(Vector3D position);
 
+Entity *cube_wall_new(Vector3D position);
+
 void cube_update(Entity *self);
 
 void cube_think(Entity *self);

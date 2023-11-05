@@ -201,6 +201,7 @@ void player_think(Entity *self)
         }
 
         if (keys[SDL_SCANCODE_F])self->isBlocking = 1; else self->isBlocking = 0;
+        if (keys[SDL_SCANCODE_TAB])self->inStats = 1; else self->inStats = 0;
         
         //Gravity function
         if(self->position.z > 5)
@@ -280,11 +281,14 @@ void change_player_speed(float newMult)
 
 void set_player_data()
 {
+    
     plr->currHealth = 9;
     plr->maxHealth = 10;
 
     PlayerData *pd;
     pd = gfc_allocate_array(sizeof(PlayerData), 1);
+
+    pd->defense = 0.0;
 
     pd->currArrow = 20;
     pd->maxArrow = 20;

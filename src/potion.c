@@ -8,7 +8,6 @@ void potion_update(Entity *self);
 
 void potion_think(Entity *self);
 
-
 Entity *potion_health_new(Vector3D position)
 {
     PotionData *pd;
@@ -23,7 +22,7 @@ Entity *potion_health_new(Vector3D position)
     ent->selectedColor = gfc_color(0.1,1,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     ent->model = gf3d_model_load("models/potion_health.model");
-    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->scale = vector3d(2.0, 2.0, 2.0);
     ent->think = potion_think;
     ent->update = potion_update;
     
@@ -55,7 +54,7 @@ Entity *potion_cursed_health_new(Vector3D position)
     ent->selectedColor = gfc_color(0.1,1,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     ent->model = gf3d_model_load("models/potion_defense.model");
-    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->scale = vector3d(2.0, 2.0, 2.0);
     ent->think = potion_think;
     ent->update = potion_update;
     
@@ -87,7 +86,7 @@ Entity *potion_damage_new(Vector3D position)
     ent->selectedColor = gfc_color(0.1,1,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     ent->model = gf3d_model_load("models/potion_attack.model");
-    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->scale = vector3d(2.0, 2.0, 2.0);
     ent->think = potion_think;
     ent->update = potion_update;
     
@@ -119,7 +118,7 @@ Entity *potion_cursed_damage_new(Vector3D position)
     ent->selectedColor = gfc_color(0.1,1,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     ent->model = gf3d_model_load("models/potion_magic.model");
-    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->scale = vector3d(2.0, 2.0, 2.0);
     ent->think = potion_think;
     ent->update = potion_update;
     
@@ -151,7 +150,7 @@ Entity *potion_speed_new(Vector3D position)
     ent->selectedColor = gfc_color(0.1,1,0.1,1);
     ent->color = gfc_color(1,1,1,1);
     ent->model = gf3d_model_load("models/potion_speed.model");
-    ent->scale = vector3d(5.0, 5.0, 5.0);
+    ent->scale = vector3d(2.0, 2.0, 2.0);
     ent->think = potion_think;
     ent->update = potion_update;
     
