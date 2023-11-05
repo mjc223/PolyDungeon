@@ -65,8 +65,10 @@ typedef struct Entity_S
 
     int         isRigidBody;
 
+    int         isWalking;
     int         isCrouching;
     int         isGrounded;
+    int         isBlocking;
 
     // BEGIN POLY DUNGEON
     

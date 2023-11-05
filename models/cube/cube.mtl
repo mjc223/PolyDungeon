@@ -1,35 +1,23 @@
 # Blender MTL File: 'None'
-# Material Count: 3
+# Material Count: 2
 
-newmtl Material__245
-Ns 9.803923
+newmtl Material
+Ns 250.000000
 Ka 1.000000 1.000000 1.000000
-Kd 0.588000 0.588000 0.588000
-Ks 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
-Ni 1.500000
+Ni 1.450000
 d 1.000000
-illum 1
-map_Kd /home/cedzed75/Downloads/GameCube - Metroid Prime - Cube/Cube/06955fa2.png
+illum 2
 
-newmtl Material__246
-Ns 9.803923
+newmtl model\om\om0213\om021_toy1.png
+Ns 96.078421
 Ka 1.000000 1.000000 1.000000
-Kd 0.588000 0.588000 0.588000
-Ks 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
-Ni 1.500000
+Ni 1.000000
 d 1.000000
-illum 1
-map_Kd /home/cedzed75/Downloads/GameCube - Metroid Prime - Cube/Cube/7bde8cd3.png
-
-newmtl Material__247
-Ns 9.803923
-Ka 1.000000 1.000000 1.000000
-Kd 0.588000 0.588000 0.588000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-d 1.000000
-illum 1
-map_Kd /home/cedzed75/Downloads/GameCube - Metroid Prime - Cube/Cube/bee1f32f.png
+illum 2
+map_Kd Downloads/Xbox 360 - Dead Rising - Toy Cube/Toy Cube (DR)/Textures/toy1.png

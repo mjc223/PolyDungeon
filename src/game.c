@@ -34,12 +34,13 @@ int main(int argc,char *argv[])
     
     Sprite *mouse = NULL;
     Sprite *playerFace = NULL;
+    Sprite *blockImage = NULL;
 
     int mousex,mousey;
     //Uint32 then;
     float mouseFrame = 0;
     World *w;
-    Entity *agu, *cube,
+    Entity *agu, *cube, *cube2, *cube3,
         *potionHealth, *potionCursedHealth,
         *potionDamage, *potionCursedDamage,
         *potionSpeed,
@@ -72,10 +73,14 @@ int main(int argc,char *argv[])
     
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     playerFace = gf2d_sprite_load("images/playerFace.png", 120, 120, 1);
+    blockImage = gf2d_sprite_load("images/shield.png", 262, 320, 1);
     
     //Entities
     agu = agumon_new(vector3d(100, 100, 20));
     cube = cube_new(vector3d(0, 0, -5));
+    cube2 = cube_new(vector3d(100000, 0, -5));
+    cube3 = cube_new(vector3d(-10000, 0, 100000));
+    
     //Potions
     potionHealth = potion_health_new(vector3d(400, 400, 15));
     potionCursedHealth = potion_cursed_health_new(vector3d(450, 450, 15));
@@ -97,6 +102,7 @@ int main(int argc,char *argv[])
     gf3d_camera_set_scale(vector3d(1,1,1));
     plr = player_new(vector3d(0,0,15));
     
+    
     for (a = 0; a < 100; a++)
     {
         particle[a].position = vector3d(gfc_crandom() * 100,gfc_crandom() * 100,gfc_crandom() * 100);
@@ -104,6 +110,7 @@ int main(int argc,char *argv[])
 //        particle[a].color = gfc_color(gfc_random(),gfc_random(),gfc_random(),1);
         particle[a].size = 100 * gfc_random();
     }
+    
     a = 0;
     sky = gf3d_model_load("models/sky.model");
     gfc_matrix_identity(skyMat);
@@ -133,10 +140,12 @@ int main(int argc,char *argv[])
                 world_draw(w);
                 entity_draw_all();
                 
+                /*
                 for (a = 0; a < 100; a++)
                 {
                     gf3d_particle_draw(&particle[a]);
                 }
+                */
             //2D draws
                 gf2d_draw_rect_filled(gfc_rect(10,10,1000,32),gfc_color8(128,128,128,255));
                 gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
@@ -179,9 +188,12 @@ int main(int argc,char *argv[])
                 snprintf(buffer_position, max_len_position, "My Position: X: %f Y: %f Z: %f",
                 positionVect.x, positionVect.y, positionVect.z);
                 gf2d_font_draw_line_tag(buffer_position,FT_H1,gfc_color(1,1,1,1), vector2d(10,200));
-                
-                gf2d_sprite_draw(playerFace, vector2d(1000, 10), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);
 
+                if(plr->isBlocking == 1)
+                {
+                    gf2d_sprite_draw(blockImage, vector2d(800, 300), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);    
+                }
+                gf2d_sprite_draw(playerFace, vector2d(1000, 10), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);
                 gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
         gf3d_vgraphics_render_end();
 

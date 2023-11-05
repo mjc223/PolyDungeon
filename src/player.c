@@ -12,7 +12,7 @@ void player_update(Entity *self);
 Entity *plr;
 
 Vector3D lastPos;
-float teleportTimer = 30;
+int dodgeTimer = 300;
 
 Entity *player_new(Vector3D position)
 {   
@@ -35,6 +35,8 @@ Entity *player_new(Vector3D position)
     plr->rotation.z = -GFC_HALF_PI;
     plr->hidden = 1;
     plr->isCrouching = 0;
+    plr->isWalking = 0;
+    plr->isBlocking = 0;
     plr->isGrounded = 0;
 
     Box b = gfc_box(position.x, position.y, position.z, 20, 20, 50);
@@ -51,6 +53,8 @@ void player_think(Entity *self)
     PlayerData *checkPd = self->customData;
     Vector3D forward = {0};
     Vector3D right = {0};
+    Vector3D dodgeRightVect = {0};
+    Vector3D dodgeForwardVect = {0};
     Vector2D w,mouse;
     Entity *other;
 
@@ -72,6 +76,8 @@ void player_think(Entity *self)
 
     if (keys[SDL_SCANCODE_LSHIFT])
         sprintMult = 2;
+    else if (keys[SDL_SCANCODE_LALT])
+        sprintMult = 0.5;
 
     forward.x = w.x * checkPd->speedMult * sprintMult;
     forward.y = w.y * checkPd->speedMult * sprintMult;
@@ -85,7 +91,9 @@ void player_think(Entity *self)
     {
         vector3d_copy(self->position, lastPos);
         
-    }
+    }            
+    vector3d_copy(dodgeRightVect, right);
+    vector3d_copy(dodgeForwardVect, forward);
 
     if(other != NULL)
         {
@@ -169,8 +177,30 @@ void player_think(Entity *self)
         }
         //if (keys[SDL_SCANCODE_SPACE])self->position.z += 1 * checkPd->speedMult;
         //if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1 * checkPd->speedMult;
-        if (keys[SDL_SCANCODE_C])self->isCrouching = 1; else self->isCrouching = 0;
+        if (keys[SDL_SCANCODE_C] || keys[SDL_SCANCODE_LCTRL])self->isCrouching = 1; else self->isCrouching = 0;
 
+        if(keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_RIGHT] 
+        || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_DOWN])
+        {
+            
+
+            dodgeRightVect.x = dodgeRightVect.x * 150;
+            dodgeRightVect.y = dodgeRightVect.y * 150;
+            
+            dodgeForwardVect.x = dodgeForwardVect.x * 150;
+            dodgeForwardVect.y = dodgeForwardVect.y * 150;
+
+            if(dodgeTimer >= 3000)
+            {
+                dodgeTimer = 0;
+                if (keys[SDL_SCANCODE_LEFT]) vector3d_add(self->position, self->position, -dodgeRightVect);
+                if (keys[SDL_SCANCODE_RIGHT]) vector3d_add(self->position, self->position, dodgeRightVect);
+                if (keys[SDL_SCANCODE_UP]) vector3d_add(self->position, self->position, dodgeForwardVect);
+                if (keys[SDL_SCANCODE_DOWN]) vector3d_add(self->position, self->position, -dodgeForwardVect);
+            }
+        }
+
+        if (keys[SDL_SCANCODE_F])self->isBlocking = 1; else self->isBlocking = 0;
         
         //Gravity function
         if(self->position.z > 5)
@@ -179,7 +209,12 @@ void player_think(Entity *self)
         }
         else
             self->isGrounded = 1;
-
+        
+        dodgeTimer++;
+        if(self->isGrounded)
+        {
+            dodgeTimer++;
+        }
     
     if (mouse.x != 0)self->rotation.z -= (mouse.x * 0.001);
     if (mouse.y != 0)self->rotation.x += (mouse.y * 0.001);
