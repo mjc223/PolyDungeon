@@ -129,14 +129,19 @@ void bird_update(Entity *self)
     }
 
     if(gfc_random() > 0.5)
-        self->position.x += gfc_random() * 0.3;        
+        self->position.x += gfc_random() * 0.4;        
     else
-        self->position.x += gfc_random() * -0.3;
+        self->position.x += gfc_random() * -0.4;
     
     if(gfc_random() > 0.5)
-        self->position.y += gfc_random() * 0.3;
+        self->position.y += gfc_random() * 0.4;
     else
-        self->position.y += gfc_random() * -0.3;
+        self->position.y += gfc_random() * -0.4;
+
+    if(gfc_random() > 0.5)
+        self->position.z += gfc_random() * 0.7;
+    else
+        self->position.z += gfc_random() * -0.7;        
 
     vector3d_add(self->position,self->position,self->velocity);
     vector3d_copy(self->bounds, self->position);
