@@ -6,7 +6,6 @@ int projectileTimer = 0;
 
 Entity *projectile_new(Entity* parent, Vector3D position, Vector3D dir, float speed, int damage)
 {
-    slog("Proj spawned");
     Entity *ent = NULL;
     
     ent = entity_new();

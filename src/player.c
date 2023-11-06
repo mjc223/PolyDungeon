@@ -86,6 +86,7 @@ void player_think(Entity *self)
 
     forward.x = w.x * checkPd->speedMult * sprintMult;
     forward.y = w.y * checkPd->speedMult * sprintMult;
+
     w = vector2d_from_angle(self->rotation.z - GFC_HALF_PI);
     right.x = w.x * checkPd->speedMult * sprintMult;
     right.y = w.y * checkPd->speedMult * sprintMult;
@@ -216,7 +217,6 @@ void player_think(Entity *self)
                 slog ("We are trying to talk to an NPC");
                 break;
             case ENT_PROJ:
-                slog ("We are being hit by an enemy projectile, ENT_PROJ");
                 break;
             default:
                 break;
@@ -356,7 +356,7 @@ void player_damage(Entity *self, int damage, Entity *inflictor)
 {
     if (self == inflictor)
         return;
-
+    slog("Ouchies");
     self->currHealth -= damage;
 }
 

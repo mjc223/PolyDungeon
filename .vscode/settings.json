@@ -10,6 +10,8 @@
         "__node_handle": "c",
         "potion.h": "c",
         "projectile.h": "c",
-        "gf3d_particle.h": "c"
+        "gf3d_particle.h": "c",
+        "locale": "c",
+        "agumon.h": "c"
     }
 }

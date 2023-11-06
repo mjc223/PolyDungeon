@@ -24,6 +24,7 @@
 #include "player.h"
 #include "potion.h"
 #include "object.h"
+#include "enemy.h"
 
 #include "world.h"
 
@@ -50,6 +51,7 @@ int main(int argc,char *argv[])
         *armorHead, *armorChest, *armorLegs, *armorBoots,*armorRing,
 
         *objDoor, *objFakeWall, *objInviswall, *objSwitch, *objTrickedDoor,
+        *enemySlime, *enemyBird, *enemyTurret,
         *plr;
     
 
@@ -114,6 +116,10 @@ int main(int argc,char *argv[])
     objSwitch = object_switch_new(vector3d(0, -125, 0), objDoor);
     objTrickedDoor = object_new(vector3d(0, -150, 0), OBJ_TRICKEDDOOR);
 
+    //Enemies
+    enemySlime = slime_new(vector3d(250, -250, 3));
+    enemyBird = bird_new(vector3d(550, -550, 20));
+    enemyTurret = turret_new(vector3d(150, -350, 0));
 
     if (agu)agu->selected = 1;
     if (cube)cube->selected = 1;
