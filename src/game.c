@@ -112,7 +112,7 @@ int main(int argc,char *argv[])
     objFakeWall = object_new(vector3d(0, -75, 0), OBJ_FAKEWALL);
     objInviswall = object_new(vector3d(0, -100, 0), OBJ_INVISWALL);
     objSwitch = object_switch_new(vector3d(0, -125, 0), objDoor);
-    objTrickedDoor = object_new(vector3d(0, -150, 0), OBJ_FAKEWALL);
+    objTrickedDoor = object_new(vector3d(0, -150, 0), OBJ_TRICKEDDOOR);
 
 
     if (agu)agu->selected = 1;

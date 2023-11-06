@@ -5,15 +5,18 @@
 #include "player.h"
 #include "potion.h"
 #include "object.h"
+#include "projectile.h"
 
 static int thirdPersonMode = 0;
 void player_think(Entity *self);
 void player_update(Entity *self);
 
 Entity *plr;
+PlayerData *pd;
 
-Vector3D lastPos;
+Vector3D lastPos, arrowOffset;
 int dodgeTimer = 300;
+int arrowTimer = 200;
 
 Entity *player_new(Vector3D position)
 {   
@@ -30,6 +33,7 @@ Entity *player_new(Vector3D position)
     plr->model = gf3d_model_load("models/dino.model");
     plr->think = player_think;
     plr->update = player_update;
+    plr->damage = player_damage;
     vector3d_copy(plr->position,position);
     vector3d_copy(lastPos, plr->position);
     plr->rotation.x = -GFC_PI;
@@ -40,7 +44,7 @@ Entity *player_new(Vector3D position)
     plr->isBlocking = 0;
     plr->isGrounded = 0;
 
-    Box b = gfc_box(position.x, position.y, position.z, 20, 20, 50);
+    Box b = gfc_box(position.x, position.y, position.z, 3, 3, 50);
     plr->bounds = b;
 
     set_player_data();
@@ -68,7 +72,7 @@ void player_think(Entity *self)
     mouse.x = mx;
     mouse.y = my;
 
-    if(self->currHealth == 0)
+    if(self->currHealth <= 0)
     {
         slog("PLAYER DEATH!");
     }
@@ -96,192 +100,194 @@ void player_think(Entity *self)
     vector3d_copy(dodgeForwardVect, forward);
 
     if(other != NULL)
+    {
+        switch(other->type)
         {
-            switch(other->type)
-            {
-                case ENT_EQUIPMENT:
-                    slog("We picked up an Equipment");
-                    ArmorData *armData;
-                    armData = other->customData;
+            case ENT_EQUIPMENT:
+                slog("We picked up an Equipment");
+                ArmorData *armData;
+                armData = other->customData;
 
-                    checkPd = plr->customData;
-                    if(armData->equipSlot == AR_HEAD)
-                    {
-                        slog ("Helmet Armor");
-                        checkPd->head = armData;
-                    }
-                    else if (armData->equipSlot == AR_CHEST)
-                    {
-                        slog ("Chest Armor");
-                        checkPd->chest = armData;
-                    }
-                    else if (armData->equipSlot == AR_LEG)
-                    {
-                        slog ("Leg Armor");
-                        checkPd->legs = armData;
-                    }
-                    else if (armData->equipSlot == AR_BOOT)
-                    {
-                        slog ("Boot Armor");
-                        checkPd->boots = armData;
-                    }
-                    else if (armData->equipSlot == AR_RING)
-                    {
-                        slog ("Ring Armor");
-                        checkPd->ring = armData;
-                        checkPd->speedMult += 0.05;
-                    }
+                checkPd = plr->customData;
+                if(armData->equipSlot == AR_HEAD)
+                {
+                    slog ("Helmet Armor");
+                    checkPd->head = armData;
+                }
+                else if (armData->equipSlot == AR_CHEST)
+                {
+                    slog ("Chest Armor");
+                    checkPd->chest = armData;
+                }
+                else if (armData->equipSlot == AR_LEG)
+                {
+                    slog ("Leg Armor");
+                    checkPd->legs = armData;
+                }
+                else if (armData->equipSlot == AR_BOOT)
+                {
+                    slog ("Boot Armor");
+                    checkPd->boots = armData;
+                }
+                else if (armData->equipSlot == AR_RING)
+                {
+                    slog ("Ring Armor");
+                    checkPd->ring = armData;
+                    checkPd->speedMult += 0.05;
+                }
 
-                    checkPd->defense += armData->defense;
+                checkPd->defense += armData->defense;
 
+                entity_free(other);
+                break;
+            case ENT_ITEM:
+                slog ("We picked up an item");
+
+                PotionData *potData;
+                potData = other->customData;
+
+                checkPd = plr->customData;
+                if(potData->pt == PT_Health)
+                {
+                    slog ("Health Potion");
+                    plr->currHealth = plr->maxHealth;
+                }
+                else if (potData->pt == PT_Health_Cursed)
+                {
+                    slog ("Cursed Health Potion");
+                    plr->currHealth = 1;
+                }
+                else if (potData->pt == PT_Damage_Boost)
+                {
+                    slog ("Damage Potion");
+                    checkPd->physicalMult = 2;
+                }
+                else if (potData->pt == PT_Damage_Boost_Cursed)
+                {
+                    slog ("Cursed Damage Potion");
+                    checkPd->physicalMult = 0.1;
+                }
+                else if (potData->pt == PT_Speed)
+                {
+                    slog("Speed potion");
+                    change_player_speed(0.75);
+                }
+                
+                entity_free(other);
+                break;
+            case ENT_INTERACT:
+                slog ("We are trying to interact");
+                ObjectData *objData;
+                slog ("prepare to set custom data");
+                objData = other->customData;
+
+                checkPd = plr->customData;
+                if(objData->objType == OBJ_DOOR)
+                {
+                    slog ("Object Door");
+                    vector3d_copy(self->position, lastPos);
+                }
+                else if (objData->objType == OBJ_FAKEWALL)
+                {
+                    slog ("Object Fake Wall");
+                }
+                else if (objData->objType == OBJ_INVISWALL)
+                {
+                    slog ("Object Invis Wall");
+                    vector3d_copy(self->position, lastPos);
+                }
+                else if (objData->objType == OBJ_SWITCH)
+                {
+                    slog ("Object Switch");
+                    vector3d_copy(self->position, lastPos);
+                    entity_free(other->target);
                     entity_free(other);
-                    break;
-                case ENT_ITEM:
-                    slog ("We picked up an item");
-
-                    PotionData *potData;
-                    potData = other->customData;
-
-                    checkPd = plr->customData;
-                    if(potData->pt == PT_Health)
-                    {
-                        slog ("Health Potion");
-                        plr->currHealth = plr->maxHealth;
-                    }
-                    else if (potData->pt == PT_Health_Cursed)
-                    {
-                        slog ("Cursed Health Potion");
-                        plr->currHealth = 1;
-                    }
-                    else if (potData->pt == PT_Damage_Boost)
-                    {
-                        slog ("Damage Potion");
-                        checkPd->physicalMult = 2;
-                    }
-                    else if (potData->pt == PT_Damage_Boost_Cursed)
-                    {
-                        slog ("Cursed Damage Potion");
-                        checkPd->physicalMult = 0.1;
-                    }
-                    else if (potData->pt == PT_Speed)
-                    {
-                        slog("Speed potion");
-                        change_player_speed(0.75);
-                    }
-                    
+                }
+                else if (objData->objType == OBJ_TRICKEDDOOR)
+                {
+                    slog ("Object Tricked Door");
+                    vector3d_copy(self->position, lastPos);
+                    plr->currHealth -= 3;
                     entity_free(other);
-                    break;
-                case ENT_INTERACT:
-                    slog ("We are trying to interact");
-                    ObjectData *objData;
-                    slog ("prepare to set custom data");
-                    objData = other->customData;
-
-                    checkPd = plr->customData;
-                    if(objData->objType == OBJ_DOOR)
-                    {
-                        slog ("Object Door");
-                        vector3d_copy(self->position, lastPos);
-                    }
-                    else if (objData->objType == OBJ_FAKEWALL)
-                    {
-                        slog ("Object Fake Wall");
-                    }
-                    else if (objData->objType == OBJ_INVISWALL)
-                    {
-                        slog ("Object Invis Wall");
-                        vector3d_copy(self->position, lastPos);
-                    }
-                    else if (objData->objType == OBJ_SWITCH)
-                    {
-                        slog ("Object Switch");
-                        vector3d_copy(self->position, lastPos);
-                        entity_free(other->target);
-                        entity_free(other);
-                    }
-                    else if (objData->objType == OBJ_TRICKEDDOOR)
-                    {
-                        slog ("Object Tricked Door");
-                        plr->currHealth -= 3;
-                        entity_free(other);
-                    }
-                    
-                    break;
-                case ENT_NPC:
-                    slog ("We are trying to talk to an NPC");
-                    break;
-                case ENT_PROJ:
-                    slog ("We are being hit by an enemy projectile");
-                    break;
-                default:
-                    break;
-            }
+                }
+                
+                break;
+            case ENT_NPC:
+                slog ("We are trying to talk to an NPC");
+                break;
+            case ENT_PROJ:
+                slog ("We are being hit by an enemy projectile, ENT_PROJ");
+                break;
+            default:
+                break;
         }
+    }
         
-        vector3d_copy(lastPos, self->position);   
-        if (keys[SDL_SCANCODE_W])
-        {   
-            vector3d_add(self->position,self->position,forward);
-        }
-        if (keys[SDL_SCANCODE_S])
-        {
-            vector3d_add(self->position,self->position,-forward);        
-        }
-        if (keys[SDL_SCANCODE_D])
-        {
-            vector3d_add(self->position,self->position,right);
-        }
-        if (keys[SDL_SCANCODE_A])    
-        {
-            vector3d_add(self->position,self->position,-right);
-        }
+    vector3d_copy(lastPos, self->position);   
+    if (keys[SDL_SCANCODE_W])
+    {   
+        vector3d_add(self->position,self->position,forward);
+    }
+    if (keys[SDL_SCANCODE_S])
+    {
+        vector3d_add(self->position,self->position,-forward);        
+    }
+    if (keys[SDL_SCANCODE_D])
+    {
+        vector3d_add(self->position,self->position,right);
+    }
+    if (keys[SDL_SCANCODE_A])    
+    {
+        vector3d_add(self->position,self->position,-right);
+    }
+    
+    if (keys[SDL_SCANCODE_SPACE] && self->isGrounded)
+    {
+        vector3d_add(self->position, self->position, vector3d(0, 0, 40));
+        self->isGrounded = 0;
+    }
+    //if (keys[SDL_SCANCODE_SPACE])self->position.z += 1 * checkPd->speedMult;
+    //if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1 * checkPd->speedMult;
+    if (keys[SDL_SCANCODE_C] || keys[SDL_SCANCODE_LCTRL])self->isCrouching = 1; else self->isCrouching = 0;
+
+    if(keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_RIGHT] 
+    || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_DOWN])
+    {
         
-        if (keys[SDL_SCANCODE_SPACE] && self->isGrounded)
-        {
-            vector3d_add(self->position, self->position, vector3d(0, 0, 40));
-            self->isGrounded = 0;
-        }
-        //if (keys[SDL_SCANCODE_SPACE])self->position.z += 1 * checkPd->speedMult;
-        //if (keys[SDL_SCANCODE_LCTRL])self->position.z -= 1 * checkPd->speedMult;
-        if (keys[SDL_SCANCODE_C] || keys[SDL_SCANCODE_LCTRL])self->isCrouching = 1; else self->isCrouching = 0;
 
-        if(keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_RIGHT] 
-        || keys[SDL_SCANCODE_UP] || keys[SDL_SCANCODE_DOWN])
-        {
-            
-
-            dodgeRightVect.x = dodgeRightVect.x * 150;
-            dodgeRightVect.y = dodgeRightVect.y * 150;
-            
-            dodgeForwardVect.x = dodgeForwardVect.x * 150;
-            dodgeForwardVect.y = dodgeForwardVect.y * 150;
-
-            if(dodgeTimer >= 3000)
-            {
-                dodgeTimer = 0;
-                if (keys[SDL_SCANCODE_LEFT]) vector3d_add(self->position, self->position, -dodgeRightVect);
-                if (keys[SDL_SCANCODE_RIGHT]) vector3d_add(self->position, self->position, dodgeRightVect);
-                if (keys[SDL_SCANCODE_UP]) vector3d_add(self->position, self->position, dodgeForwardVect);
-                if (keys[SDL_SCANCODE_DOWN]) vector3d_add(self->position, self->position, -dodgeForwardVect);
-            }
-        }
-
-        if (keys[SDL_SCANCODE_F])self->isBlocking = 1; else self->isBlocking = 0;
-        if (keys[SDL_SCANCODE_TAB])self->inStats = 1; else self->inStats = 0;
+        dodgeRightVect.x = dodgeRightVect.x * 150;
+        dodgeRightVect.y = dodgeRightVect.y * 150;
         
-        //Gravity function
-        if(self->position.z > 5)
+        dodgeForwardVect.x = dodgeForwardVect.x * 150;
+        dodgeForwardVect.y = dodgeForwardVect.y * 150;
+
+        if(dodgeTimer >= 3000)
         {
-            vector3d_add(self->position, self->position, vector3d(0, 0, -0.25));
+            dodgeTimer = 0;
+            if (keys[SDL_SCANCODE_LEFT]) vector3d_add(self->position, self->position, -dodgeRightVect);
+            if (keys[SDL_SCANCODE_RIGHT]) vector3d_add(self->position, self->position, dodgeRightVect);
+            if (keys[SDL_SCANCODE_UP]) vector3d_add(self->position, self->position, dodgeForwardVect);
+            if (keys[SDL_SCANCODE_DOWN]) vector3d_add(self->position, self->position, -dodgeForwardVect);
         }
-        else
-            self->isGrounded = 1;
-        
+    }
+
+    arrowTimer += 1;
+    if (keys[SDL_SCANCODE_F])self->isBlocking = 1; else self->isBlocking = 0;
+    if (keys[SDL_SCANCODE_TAB])self->inStats = 1; else self->inStats = 0;
+    
+    //Gravity function
+    if(self->position.z > 5)
+    {
+        vector3d_add(self->position, self->position, vector3d(0, 0, -0.25));
+    }
+    else
+        self->isGrounded = 1;
+    
+    dodgeTimer++;
+    if(self->isGrounded)
+    {
         dodgeTimer++;
-        if(self->isGrounded)
-        {
-            dodgeTimer++;
-        }
+    }
     
     if (mouse.x != 0)self->rotation.z -= (mouse.x * 0.001);
     if (mouse.y != 0)self->rotation.x += (mouse.y * 0.001);
@@ -290,6 +296,15 @@ void player_think(Entity *self)
     {
         thirdPersonMode = !thirdPersonMode;
         self->hidden = !self->hidden;
+    }
+
+    if(keys[SDL_SCANCODE_E])
+    {
+        if(arrowTimer >= 200 && pd->currArrow > 1)
+        {
+            projectile_new(self, self->position, forward, 1, 1);
+            arrowTimer = 0;
+        }
     }
 }
 
@@ -331,7 +346,18 @@ void player_update(Entity *self)
         cameraVect.z += 20;
         gf3d_camera_set_position(cameraVect);
     }
+    vector3d_copy(arrowOffset, cameraVect);
+    arrowOffset.z += 5;
     gf3d_camera_set_rotation(rotation);
+
+}
+
+void player_damage(Entity *self, int damage, Entity *inflictor)
+{
+    if (self == inflictor)
+        return;
+
+    self->currHealth -= damage;
 }
 
 Vector3D get_player_position()
@@ -351,7 +377,6 @@ void set_player_data()
     plr->currHealth = 9;
     plr->maxHealth = 10;
 
-    PlayerData *pd;
     pd = gfc_allocate_array(sizeof(PlayerData), 1);
 
     pd->defense = 0.0;

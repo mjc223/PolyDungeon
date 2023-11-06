@@ -8,6 +8,8 @@
         "entity.h": "c",
         "gf3d_model.h": "c",
         "__node_handle": "c",
-        "potion.h": "c"
+        "potion.h": "c",
+        "projectile.h": "c",
+        "gf3d_particle.h": "c"
     }
 }

@@ -33,6 +33,8 @@ typedef struct PlayerData
  */
 Entity *player_new(Vector3D position);
 
+void player_damage(Entity *self, int damage, Entity *inflictor);
+
 Vector3D get_player_position();
 
 void change_player_speed(float newMult);

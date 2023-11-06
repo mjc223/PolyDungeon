@@ -45,7 +45,7 @@ typedef struct Entity_S
     void       (*think)(struct Entity_S *self); /**<pointer to the think function*/
     void       (*update)(struct Entity_S *self); /**<pointer to the update function*/
     void       (*draw)(struct Entity_S *self); /**<pointer to an optional extra draw funciton*/
-    void       (*damage)(struct Entity_S *self, float damage, struct Entity_S *inflictor); /**<pointer to the think function*/
+    void       (*damage)(struct Entity_S *self, int damage, struct Entity_S *inflictor); /**<pointer to the think function*/
     void       (*onDeath)(struct Entity_S *self); /**<pointer to an funciton to call when the entity dies*/
     
     EntityState state;
@@ -69,7 +69,7 @@ typedef struct Entity_S
     int         isBlocking;
 
     int         inStats;
-
+    int         damageDealt;
     // BEGIN POLY DUNGEON
     
     struct Entity_S *target;    /**<entity to target for weapons / ai*/
