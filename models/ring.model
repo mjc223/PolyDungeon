@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/ring/ring.obj",
+        "texture":"models/ring/ring.png"
+    }
+}

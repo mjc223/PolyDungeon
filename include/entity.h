@@ -6,8 +6,6 @@
 #include "gfc_primitives.h"
 #include "gfc_shape.h"
 
-#include "collider.h"
-
 #include "gf3d_model.h"
 
 
@@ -69,7 +67,7 @@ typedef struct Entity_S
     int         isCrouching;
     int         isGrounded;
     int         isBlocking;
-    
+
     int         inStats;
 
     // BEGIN POLY DUNGEON

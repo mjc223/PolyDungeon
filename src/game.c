@@ -20,9 +20,11 @@
 #include "entity.h"
 #include "agumon.h"
 #include "cube.h"
-#include "potion.h"
 
 #include "player.h"
+#include "potion.h"
+#include "object.h"
+
 #include "world.h"
 
 extern int __DEBUG;
@@ -41,9 +43,13 @@ int main(int argc,char *argv[])
     float mouseFrame = 0;
     World *w;
     Entity *agu, *cube, *cube2, *cube3, *cube4, *cube5,
+
         *potionHealth, *potionCursedHealth,
-        *potionDamage, *potionCursedDamage,
-        *potionSpeed,
+        *potionDamage, *potionCursedDamage, *potionSpeed,
+
+        *armorHead, *armorChest, *armorLegs, *armorBoots,*armorRing,
+
+        *objDoor, *objFakeWall, *objInviswall, *objSwitch, *objTrickedDoor,
         *plr;
     
 
@@ -77,6 +83,10 @@ int main(int argc,char *argv[])
     
     //Entities
     agu = agumon_new(vector3d(100, 100, 20));
+        agumon_new(vector3d(125, 125, 20));
+        agumon_new(vector3d(75, 75, 20));
+
+    //Walls
     cube = cube_new(vector3d(0, 0, -5));
     cube2 = cube_wall_new(vector3d(2500, 0, -500));
     cube3 = cube_wall_new(vector3d(-2500, 0, -500));
@@ -89,7 +99,21 @@ int main(int argc,char *argv[])
     potionDamage = potion_damage_new(vector3d(500, 500, 20));
     potionCursedDamage = potion_cursed_damage_new(vector3d(550, 500, 20));
     potionSpeed = potion_speed_new(vector3d(600, 600, 20));
-    
+
+    //Armor
+    armorHead = armor_new(vector3d(-50, 0, 7), AR_HEAD);
+    armorChest = armor_new(vector3d(-65, 0, 7), AR_CHEST);
+    armorLegs = armor_new(vector3d(-80, 0, 7), AR_LEG);
+    armorBoots = armor_new(vector3d(-95, 0, 7), AR_BOOT);
+    armorRing = armor_new(vector3d(-110, 0, 7), AR_RING);
+
+    //Objects
+    objDoor = object_new(vector3d(0, -50, 0), OBJ_DOOR);
+    objFakeWall = object_new(vector3d(0, -75, 0), OBJ_FAKEWALL);
+    objInviswall = object_new(vector3d(0, -100, 0), OBJ_INVISWALL);
+    objSwitch = object_switch_new(vector3d(0, -125, 0), objDoor);
+    objTrickedDoor = object_new(vector3d(0, -150, 0), OBJ_FAKEWALL);
+
 
     if (agu)agu->selected = 1;
     if (cube)cube->selected = 1;
@@ -201,7 +225,7 @@ int main(int argc,char *argv[])
                     gf2d_draw_rect_filled(gfc_rect(600, 10, 500, 500),gfc_color8(60,60,60,255));
                     char buffer_stat[50];
                     int max_len_stat = sizeof buffer_stat;
-                    snprintf(buffer_stat, max_len_stat, "Defense: X: %f",playData->defense);
+                    snprintf(buffer_stat, max_len_stat, "Defense: %f",playData->defense);
 
                     char buffer_stat2[50];
                     int max_len_stat2 = sizeof buffer_stat2;
@@ -219,11 +243,11 @@ int main(int argc,char *argv[])
                     int max_len_stat5 = sizeof buffer_stat5;
                     snprintf(buffer_stat5, max_len_stat5, "Arrow Count: %d / %d", playData->currArrow, playData->maxArrow);
 
-                    gf2d_font_draw_line_tag(buffer_stat,FT_H1,gfc_color(1,1,1,1), vector2d(600,10));
-                    gf2d_font_draw_line_tag(buffer_stat2,FT_H1,gfc_color(1,1,1,1), vector2d(600,30));
-                    gf2d_font_draw_line_tag(buffer_stat3,FT_H1,gfc_color(1,1,1,1), vector2d(600,50));
-                    gf2d_font_draw_line_tag(buffer_stat4,FT_H1,gfc_color(1,1,1,1), vector2d(600,70));
-                    gf2d_font_draw_line_tag(buffer_stat5,FT_H1,gfc_color(1,1,1,1), vector2d(600,90));
+                    gf2d_font_draw_line_tag(buffer_stat,FT_H1,gfc_color(0,1,1,1), vector2d(600,10));
+                    gf2d_font_draw_line_tag(buffer_stat2,FT_H1,gfc_color(0,1,1,1), vector2d(600,30));
+                    gf2d_font_draw_line_tag(buffer_stat3,FT_H1,gfc_color(0,1,1,1), vector2d(600,50));
+                    gf2d_font_draw_line_tag(buffer_stat4,FT_H1,gfc_color(0,1,1,1), vector2d(600,70));
+                    gf2d_font_draw_line_tag(buffer_stat5,FT_H1,gfc_color(0,1,1,1), vector2d(600,90));
                 }
 
                 gf2d_sprite_draw(playerFace, vector2d(1000, 10), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);

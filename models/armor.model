@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/armor/armor.obj",
+        "texture":"models/armor/armor.png"
+    }
+}

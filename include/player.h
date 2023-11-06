@@ -2,9 +2,16 @@
 #define __PLAYER_H__
 
 #include "entity.h"
+#include "armor.h"
 
 typedef struct PlayerData
 {
+    ArmorData *head;
+    ArmorData *chest;
+    ArmorData *legs;
+    ArmorData *boots;
+    ArmorData *ring;
+
     float defense;
 
     int currArrow;

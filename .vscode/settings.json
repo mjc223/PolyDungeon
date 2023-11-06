@@ -7,6 +7,7 @@
         "simple_logger.h": "c",
         "entity.h": "c",
         "gf3d_model.h": "c",
-        "__node_handle": "c"
+        "__node_handle": "c",
+        "potion.h": "c"
     }
 }

@@ -4,6 +4,7 @@
 #include "gf3d_camera.h"
 #include "player.h"
 #include "potion.h"
+#include "object.h"
 
 static int thirdPersonMode = 0;
 void player_think(Entity *self);
@@ -89,8 +90,7 @@ void player_think(Entity *self)
 
     if(other != NULL && other->type == ENT_WALL)
     {
-        vector3d_copy(self->position, lastPos);
-        
+        vector3d_copy(self->position, lastPos);        
     }            
     vector3d_copy(dodgeRightVect, right);
     vector3d_copy(dodgeForwardVect, forward);
@@ -101,6 +101,40 @@ void player_think(Entity *self)
             {
                 case ENT_EQUIPMENT:
                     slog("We picked up an Equipment");
+                    ArmorData *armData;
+                    armData = other->customData;
+
+                    checkPd = plr->customData;
+                    if(armData->equipSlot == AR_HEAD)
+                    {
+                        slog ("Helmet Armor");
+                        checkPd->head = armData;
+                    }
+                    else if (armData->equipSlot == AR_CHEST)
+                    {
+                        slog ("Chest Armor");
+                        checkPd->chest = armData;
+                    }
+                    else if (armData->equipSlot == AR_LEG)
+                    {
+                        slog ("Leg Armor");
+                        checkPd->legs = armData;
+                    }
+                    else if (armData->equipSlot == AR_BOOT)
+                    {
+                        slog ("Boot Armor");
+                        checkPd->boots = armData;
+                    }
+                    else if (armData->equipSlot == AR_RING)
+                    {
+                        slog ("Ring Armor");
+                        checkPd->ring = armData;
+                        checkPd->speedMult += 0.05;
+                    }
+
+                    checkPd->defense += armData->defense;
+
+                    entity_free(other);
                     break;
                 case ENT_ITEM:
                     slog ("We picked up an item");
@@ -108,8 +142,7 @@ void player_think(Entity *self)
                     PotionData *potData;
                     potData = other->customData;
 
-                    PlayerData *playerData;
-                    playerData = plr->customData;
+                    checkPd = plr->customData;
                     if(potData->pt == PT_Health)
                     {
                         slog ("Health Potion");
@@ -123,12 +156,12 @@ void player_think(Entity *self)
                     else if (potData->pt == PT_Damage_Boost)
                     {
                         slog ("Damage Potion");
-                        playerData->physicalMult = 2;
+                        checkPd->physicalMult = 2;
                     }
                     else if (potData->pt == PT_Damage_Boost_Cursed)
                     {
                         slog ("Cursed Damage Potion");
-                        playerData->physicalMult = 0.1;
+                        checkPd->physicalMult = 0.1;
                     }
                     else if (potData->pt == PT_Speed)
                     {
@@ -140,6 +173,39 @@ void player_think(Entity *self)
                     break;
                 case ENT_INTERACT:
                     slog ("We are trying to interact");
+                    ObjectData *objData;
+                    slog ("prepare to set custom data");
+                    objData = other->customData;
+
+                    checkPd = plr->customData;
+                    if(objData->objType == OBJ_DOOR)
+                    {
+                        slog ("Object Door");
+                        vector3d_copy(self->position, lastPos);
+                    }
+                    else if (objData->objType == OBJ_FAKEWALL)
+                    {
+                        slog ("Object Fake Wall");
+                    }
+                    else if (objData->objType == OBJ_INVISWALL)
+                    {
+                        slog ("Object Invis Wall");
+                        vector3d_copy(self->position, lastPos);
+                    }
+                    else if (objData->objType == OBJ_SWITCH)
+                    {
+                        slog ("Object Switch");
+                        vector3d_copy(self->position, lastPos);
+                        entity_free(other->target);
+                        entity_free(other);
+                    }
+                    else if (objData->objType == OBJ_TRICKEDDOOR)
+                    {
+                        slog ("Object Tricked Door");
+                        plr->currHealth -= 3;
+                        entity_free(other);
+                    }
+                    
                     break;
                 case ENT_NPC:
                     slog ("We are trying to talk to an NPC");
@@ -151,7 +217,7 @@ void player_think(Entity *self)
                     break;
             }
         }
-
+        
         vector3d_copy(lastPos, self->position);   
         if (keys[SDL_SCANCODE_W])
         {   

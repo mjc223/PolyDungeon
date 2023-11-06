@@ -3,7 +3,7 @@
 
 #include "entity.h"
 
-typedef enum
+typedef enum PotionType
 {
     PT_Health,
     PT_Health_Cursed,
