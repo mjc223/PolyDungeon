@@ -38,8 +38,10 @@ int main(int argc,char *argv[])
     Sprite *mouse = NULL;
     Sprite *playerFace = NULL;
     Sprite *blockImage = NULL;
+    Sprite *titleImage = NULL;
 
     int mousex,mousey;
+    int mainMenu = 1;
     //Uint32 then;
     float mouseFrame = 0;
     World *w;
@@ -82,6 +84,7 @@ int main(int argc,char *argv[])
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     playerFace = gf2d_sprite_load("images/playerFace.png", 120, 120, 1);
     blockImage = gf2d_sprite_load("images/shield.png", 262, 320, 1);
+    titleImage = gf2d_sprite_load("images/title.png", 1280, 720, 1);
     
     //Entities
     agu = agumon_new(vector3d(100, 100, 20));
@@ -150,6 +153,7 @@ int main(int argc,char *argv[])
     
     // main game loop
     slog("gf3d main loop begin");
+
     while(!done)
     {
         gfc_input_update();
@@ -179,7 +183,15 @@ int main(int argc,char *argv[])
                 }
                 */
             //2D draws
-                gf2d_draw_rect_filled(gfc_rect(10,10,1000,32),gfc_color8(128,128,128,255));
+
+                //Main Menu
+                if(mainMenu == 1)
+                    gf2d_sprite_draw(titleImage, vector2d(0, 0), vector2d(2,2), vector3d(0,0,0), gfc_color(1, 1, 1, 1), (Uint32)1);    
+
+                    //Main Menu Song
+                else
+                {
+                                    gf2d_draw_rect_filled(gfc_rect(10,10,1000,32),gfc_color8(128,128,128,255));
                 gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
                 
                 gf2d_draw_rect_filled(gfc_rect(10,100,300,32),gfc_color8(60,60,60,255));
@@ -259,6 +271,11 @@ int main(int argc,char *argv[])
                 gf2d_sprite_draw(playerFace, vector2d(1000, 10), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);
 
                 gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
+                }
+
+                const Uint8 * keys;
+                keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+                if(keys[SDL_SCANCODE_RETURN]) mainMenu = 0;
         gf3d_vgraphics_render_end();
 
         if (gfc_input_command_down("exit"))done = 1; // exit condition
