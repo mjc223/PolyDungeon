@@ -4,6 +4,8 @@
 
 Vector3D startPos;
 NPCData *data;
+const char *messages[2];
+
 
 Entity *npc_new(Vector3D position, int id)
 {
@@ -30,6 +32,9 @@ Entity *npc_new(Vector3D position, int id)
 
     Box b = gfc_box(position.x, position.y, position.z, 20, 20, 50);
     ent->bounds = b;
+
+    messages[0] = "Hey what's up";
+    messages[1] = "And we got another line";
 
     set_npc_data(ent);
 
@@ -87,9 +92,13 @@ void set_npc_data(Entity *self)
     data = gfc_allocate_array(sizeof(NPCData), 1);
 
     data->name = "Jeff";
-    data->message = "What's good.";
+    data->message = messages[0];
 
     self->customData = data;
 }
 
+void iterate_npc_message()
+{
+    data->message = messages[1];
+}
 /*eol@eof*/

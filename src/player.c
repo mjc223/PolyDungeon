@@ -22,7 +22,7 @@ NPCData *pastData = {0};
 Vector3D lastPos, arrowOffset;
 int dodgeTimer = 300;
 int arrowTimer = 200;
-
+int npcRetrigger = 0;
 Entity *player_new(Vector3D position)
 {   
     plr = NULL;
@@ -220,20 +220,27 @@ void player_think(Entity *self)
                 
                 break;
             case ENT_NPC:
-                NPCData *data = other->customData;
-                if(data != pastData)
+                if(npcRetrigger == 0)
                 {
-                    slog ("We are trying to talk to an NPC");
+                    NPCData *data = other->customData;
+                    slog ("---BEGIN NPC DIALOGUE---");
                     slog (data->name);
                     slog (data->message);
                     pastData = data;
+                    npcRetrigger = 1;
                 }
+                iterate_npc_message();
+
                 break;
             case ENT_PROJ:
                 break;
             default:
                 break;
         }
+    }
+    else
+    {
+        npcRetrigger = 0;
     }
         
     vector3d_copy(lastPos, self->position);   

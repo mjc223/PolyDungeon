@@ -24,4 +24,6 @@ void npc_damage(Entity *self, int damage, Entity *inflictor);
 
 void set_npc_data();
 
+void iterate_npc_message();
+
 #endif
