@@ -41,7 +41,7 @@ void agumon_update(Entity *self)
     vector3d_add(self->position,self->position,self->velocity);
     vector3d_copy(self->bounds, self->position);
 
-    self->rotation.z += 0.01;
+    //self->rotation.z += 0.01;
 }
 
 void agumon_think(Entity *self)

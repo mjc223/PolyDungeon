@@ -1,0 +1,7 @@
+{
+    "model":
+    {
+        "model":"models/slime2/slime.obj",
+        "texture":"models/slime2/slime.png"
+    }
+}

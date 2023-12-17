@@ -2,6 +2,8 @@
 #include "gfc_types.h"
 
 #include "gf3d_camera.h"
+#include "npc.h"
+#include "hud.h"
 #include "player.h"
 #include "potion.h"
 #include "object.h"
@@ -11,9 +13,12 @@ static int thirdPersonMode = 0;
 void player_think(Entity *self);
 void player_update(Entity *self);
 
+static char* filename = "config/player.def";
+SJson *jsonPlayer;
+
 Entity *plr;
 PlayerData *pd;
-
+NPCData *pastData = {0};
 Vector3D lastPos, arrowOffset;
 int dodgeTimer = 300;
 int arrowTimer = 200;
@@ -48,6 +53,7 @@ Entity *player_new(Vector3D position)
     plr->bounds = b;
 
     set_player_data();
+    atexit(player_save);
 
     return plr;
 }
@@ -214,7 +220,14 @@ void player_think(Entity *self)
                 
                 break;
             case ENT_NPC:
-                slog ("We are trying to talk to an NPC");
+                NPCData *data = other->customData;
+                if(data != pastData)
+                {
+                    slog ("We are trying to talk to an NPC");
+                    slog (data->name);
+                    slog (data->message);
+                    pastData = data;
+                }
                 break;
             case ENT_PROJ:
                 break;
@@ -302,6 +315,7 @@ void player_think(Entity *self)
     {
         if(arrowTimer >= 200 && pd->currArrow > 1)
         {
+            pd->currArrow--;
             projectile_new(self, self->position, forward, 1, 1);
             arrowTimer = 0;
         }
@@ -379,20 +393,84 @@ void set_player_data()
 
     pd = gfc_allocate_array(sizeof(PlayerData), 1);
 
-    pd->defense = 0.0;
-
-    pd->currArrow = 20;
-    pd->maxArrow = 20;
-
-    pd->currMana = 10;
-    pd->maxMana = 10;
-
-    pd->arrowMult = 1.0;
-    pd->magicMult = 1.0;
-    pd->physicalMult = 1.0;
-    pd->speedMult = 0.15;
-
     plr->customData = pd;
+
+    SJson *playerObj;
+
+    if (!filename) return;
+
+    jsonPlayer = sj_load(filename); //have a default player json
+    if(!jsonPlayer) return;
+
+    playerObj = sj_object_get_value(jsonPlayer, "player");
+    if(!playerObj)
+    {
+        slog("file %s missing player object", filename);
+        sj_free(jsonPlayer);
+        return;
+    }
+
+    sj_object_get_value_as_float(playerObj, "xPos", &plr->position.x);
+    sj_object_get_value_as_float(playerObj, "yPos", &plr->position.y);
+    sj_object_get_value_as_float(playerObj, "zPos", &plr->position.z);
+
+    sj_object_get_value_as_float(playerObj, "speedMult", &pd->speedMult);
+
+    sj_object_get_value_as_float(playerObj, "physicalMult", &pd->physicalMult);
+    sj_object_get_value_as_float(playerObj, "magicMult", &pd->magicMult);
+
+}
+
+void player_save()
+{
+    SJson *jsonCopy, *playerNew;
+
+    if (!filename) return;
+
+    if(!jsonPlayer) return;
+
+    jsonCopy = sj_copy(jsonPlayer);
+
+    playerNew = player_save_writer();
+
+    sj_object_delete_key(jsonCopy, "player");
+
+    sj_object_insert(jsonCopy, "player", playerNew);
+
+    sj_save(jsonCopy, "config/player.def");
+}
+
+SJson* player_save_writer()
+{
+    SJson *newXPos, *newYPos, *newZPos, *newSpeedMult, *newPhysicalMult, *newMagicMult;
+
+    SJson *newPlayer;
+    newPlayer = sj_object_new();
+
+    PlayerData *pd = plr->customData;
+
+    newXPos = sj_new_float(plr->position.x);
+    newYPos = sj_new_float(plr->position.y);
+    newZPos = sj_new_float(plr->position.z);
+
+    newSpeedMult = sj_new_float(pd->speedMult);
+
+    newPhysicalMult = sj_new_float(pd->physicalMult);
+    newMagicMult = sj_new_float(pd->magicMult);
+    
+    sj_object_insert(newPlayer, "xPos", newXPos);
+    sj_object_insert(newPlayer, "yPos", newYPos);
+    sj_object_insert(newPlayer, "zPos", newZPos);
+    sj_object_insert(newPlayer, "speedMult", newSpeedMult);
+    sj_object_insert(newPlayer, "physicalMult", newPhysicalMult);
+    sj_object_insert(newPlayer, "magicMult", newMagicMult); 
+
+    return newPlayer;
+}
+
+Entity *plr_copy()
+{
+    return plr;
 }
 
 /*eol@eof*/

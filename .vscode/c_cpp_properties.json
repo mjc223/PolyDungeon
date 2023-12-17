@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "/usr/include/SDL2",
                 "${workspaceFolder}/gfc/simple_logger/include",
-                "${workspaceFolder}/object.h"
+                "${workspaceFolder}/object.h",
+                "${workspaceFolder}/gfc/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

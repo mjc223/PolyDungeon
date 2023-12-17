@@ -12,6 +12,8 @@
         "projectile.h": "c",
         "gf3d_particle.h": "c",
         "locale": "c",
-        "agumon.h": "c"
+        "agumon.h": "c",
+        "gfc_vector.h": "c",
+        "player.h": "c"
     }
 }

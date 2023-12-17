@@ -6,7 +6,7 @@
 
 Vector3D startingPos;
 int turretTimer = 0;
-
+int slimeAnimTimer = 0;
 Entity *slime_new(Vector3D position)
 {
     Entity *ent = NULL;
@@ -42,6 +42,16 @@ void slime_update(Entity *self)
         slog("self pointer not provided");
         return;
     }
+    if (slimeAnimTimer == 50)
+    {
+        self->model = gf3d_model_load("models/slime2.model");
+    }
+    else if (slimeAnimTimer == 100)
+    {
+        slimeAnimTimer = 0;
+        self->model = gf3d_model_load("models/slime.model");
+    }
+    /*
 
     if(gfc_random() > 0.5)
         self->position.x += gfc_random() * 0.3;        
@@ -52,6 +62,7 @@ void slime_update(Entity *self)
         self->position.y += gfc_random() * 0.3;
     else
         self->position.y += gfc_random() * -0.3;
+    */
 
     vector3d_add(self->position,self->position,self->velocity);
     vector3d_copy(self->bounds, self->position);
@@ -60,6 +71,7 @@ void slime_update(Entity *self)
 
 void slime_think(Entity *self)
 {
+    slimeAnimTimer++;
     if (!self)return;
     switch(self->state)
     {
@@ -127,21 +139,6 @@ void bird_update(Entity *self)
         slog("self pointer not provided");
         return;
     }
-
-    if(gfc_random() > 0.5)
-        self->position.x += gfc_random() * 0.4;        
-    else
-        self->position.x += gfc_random() * -0.4;
-    
-    if(gfc_random() > 0.5)
-        self->position.y += gfc_random() * 0.4;
-    else
-        self->position.y += gfc_random() * -0.4;
-
-    if(gfc_random() > 0.5)
-        self->position.z += gfc_random() * 0.7;
-    else
-        self->position.z += gfc_random() * -0.7;        
 
     vector3d_add(self->position,self->position,self->velocity);
     vector3d_copy(self->bounds, self->position);
@@ -244,6 +241,7 @@ void turret_think(Entity *self)
         entity_free(self);
     }
 
+    /*
     turretTimer++;
     if(turretTimer >= 3000)
     {
@@ -256,6 +254,7 @@ void turret_think(Entity *self)
         projectile_new(self, self->position, dir, 1, 1);
         turretTimer = 0;
     }
+    */
 }
 
 void turret_damage(Entity *self, int damage, Entity *inflictor)

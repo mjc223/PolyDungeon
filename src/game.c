@@ -4,6 +4,7 @@
 #include "gfc_input.h"
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
+#include "gfc_audio.h"
 
 #include "gf3d_vgraphics.h"
 #include "gf3d_pipeline.h"
@@ -21,11 +22,12 @@
 #include "agumon.h"
 #include "cube.h"
 
+#include "npc.h"
 #include "player.h"
 #include "potion.h"
 #include "object.h"
 #include "enemy.h"
-
+#include "hud.h"
 #include "world.h"
 
 extern int __DEBUG;
@@ -39,6 +41,11 @@ int main(int argc,char *argv[])
     Sprite *playerFace = NULL;
     Sprite *blockImage = NULL;
     Sprite *titleImage = NULL;
+
+    Sprite *bootIco, *swordIco,
+     *wandIco, *shieldIco, *arrowIco;
+
+    Sound *gameMusic;
 
     int mousex,mousey;
     int mainMenu = 1;
@@ -54,7 +61,9 @@ int main(int argc,char *argv[])
 
         *objDoor, *objFakeWall, *objInviswall, *objSwitch, *objTrickedDoor,
         *enemySlime, *enemyBird, *enemyTurret,
-        *plr;
+        *plr,
+        
+        *npc;
     
 
     Particle particle[100];
@@ -79,17 +88,25 @@ int main(int argc,char *argv[])
     slog_sync();
     
     entity_system_init(1024);
+    hud_init();
     
     
     mouse = gf2d_sprite_load("images/pointer.png",32,32, 16);
     playerFace = gf2d_sprite_load("images/playerFace.png", 120, 120, 1);
     blockImage = gf2d_sprite_load("images/shield.png", 262, 320, 1);
     titleImage = gf2d_sprite_load("images/title.png", 1280, 720, 1);
-    
+
+    bootIco = gf2d_sprite_load("images/boots.png", 512, 512, 1);
+    swordIco = gf2d_sprite_load("images/sword.png", 512, 512, 1);
+    wandIco = gf2d_sprite_load("images/wand.png", 512, 512, 1);
+    shieldIco = gf2d_sprite_load("images/shieldIco.png", 512, 512, 1);
+    arrowIco = gf2d_sprite_load("images/arrow.png", 512, 512, 1);
     //Entities
     agu = agumon_new(vector3d(100, 100, 20));
         agumon_new(vector3d(125, 125, 20));
         agumon_new(vector3d(75, 75, 20));
+
+    npc = npc_new(vector3d(15, -15, 20), 1);
 
     //Walls
     cube = cube_new(vector3d(0, 0, -5));
@@ -151,6 +168,10 @@ int main(int argc,char *argv[])
     gfc_matrix_identity(skyMat);
     gfc_matrix_scale(skyMat,vector3d(100,100,100));
     
+    gfc_audio_init(256,16,4,1,1,1);
+    gameMusic = gfc_sound_load("music/wisdom.mp3", 50.0, -1);
+    gfc_sound_play(gameMusic, -1, 30.0, -1, -1);
+
     // main game loop
     slog("gf3d main loop begin");
 
@@ -186,91 +207,110 @@ int main(int argc,char *argv[])
 
                 //Main Menu
                 if(mainMenu == 1)
+                {
                     gf2d_sprite_draw(titleImage, vector2d(0, 0), vector2d(2,2), vector3d(0,0,0), gfc_color(1, 1, 1, 1), (Uint32)1);    
-
-                    //Main Menu Song
+                }
                 else
                 {
-                                    gf2d_draw_rect_filled(gfc_rect(10,10,1000,32),gfc_color8(128,128,128,255));
-                gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
-                
-                gf2d_draw_rect_filled(gfc_rect(10,100,300,32),gfc_color8(60,60,60,255));
-                char buffer[50];
-                int max_len = sizeof buffer;
-                snprintf(buffer, max_len, "Health: %d / %d", plr->currHealth, plr->maxHealth);
-                gf2d_font_draw_line_tag(buffer,FT_H1,gfc_color(1,1,1,1), vector2d(10,100));
-                
-                
-                gf2d_draw_rect_filled(gfc_rect(10,125,800,32),gfc_color8(60,60,60,255));
-                char buffer_velocity[100];
-                int max_len_velocity = sizeof buffer_velocity;
-                PlayerData *playData;
-                playData = plr->customData;
-                snprintf(buffer_velocity, max_len_velocity, "X Rot %f, Y Rot %f, Z Rot %f",
-                    plr->rotation.x, plr->rotation.y, plr->rotation.z);
-                gf2d_font_draw_line_tag(buffer_velocity,FT_H1,gfc_color(1,1,1,1), vector2d(10,125));
+                    hud_update_all();
 
-                gf2d_draw_rect_filled(gfc_rect(10,150,400,32),gfc_color8(60,60,60,255));
-                char buffer_speed[50];
-                int max_len_speed = sizeof buffer_speed;
-                snprintf(buffer_speed, max_len_speed, "Speed %f ",
-                    playData->speedMult);
-                gf2d_font_draw_line_tag(buffer_speed,FT_H1,gfc_color(1,1,1,1), vector2d(10,150));
+                       gf2d_draw_rect_filled(gfc_rect(10,10,1000,32),gfc_color8(128,128,128,255));
+                        gf2d_font_draw_line_tag("Press ALT+F4 to exit",FT_H1,gfc_color(1,1,1,1), vector2d(10,10));
 
-                gf2d_draw_rect_filled(gfc_rect(10, 175, 300,32),gfc_color8(60,60,60,255));
-                char buffer_mana[50];
-                int max_len_mana = sizeof buffer_mana;
-                snprintf(buffer_mana, max_len_mana, "Mana %d / %d",
-                    playData->currMana, playData->maxMana);
-                gf2d_font_draw_line_tag(buffer_mana,FT_H1,gfc_color(1,1,1,1), vector2d(10,175));
+                        gf2d_draw_rect_filled(gfc_rect(10,100,300,32),gfc_color8(60,60,60,255));
+                        char buffer[50];
+                        int max_len = sizeof buffer;
+                        snprintf(buffer, max_len, "Health: %d / %d", plr->currHealth, plr->maxHealth);
+                        gf2d_font_draw_line_tag(buffer,FT_H1,gfc_color(1,1,1,1), vector2d(10,100));
+                        
 
-                gf2d_draw_rect_filled(gfc_rect(10, 200, 500,32),gfc_color8(60,60,60,255));
-                char buffer_position[50];
-                int max_len_position = sizeof buffer_position;
-                Vector3D positionVect;
-                positionVect = get_player_position();
-                snprintf(buffer_position, max_len_position, "My Position: X: %f Y: %f Z: %f",
-                positionVect.x, positionVect.y, positionVect.z);
-                gf2d_font_draw_line_tag(buffer_position,FT_H1,gfc_color(1,1,1,1), vector2d(10,200));
+                        gf2d_draw_rect_filled(gfc_rect(10,125,800,32),gfc_color8(60,60,60,255));
+                        char buffer_velocity[100];
+                        int max_len_velocity = sizeof buffer_velocity;
+                        PlayerData *playData;
+                        playData = plr->customData;
+                        snprintf(buffer_velocity, max_len_velocity, "X Rot %f, Y Rot %f, Z Rot %f",
+                            plr->rotation.x, plr->rotation.y, plr->rotation.z);
+                        gf2d_font_draw_line_tag(buffer_velocity,FT_H1,gfc_color(1,1,1,1), vector2d(10,125));
 
-                if(plr->isBlocking == 1)
-                {
-                    gf2d_sprite_draw(blockImage, vector2d(800, 300), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);    
-                }
+                        gf2d_draw_rect_filled(gfc_rect(10,150,400,32),gfc_color8(60,60,60,255));
+                        char buffer_speed[50];
+                        int max_len_speed = sizeof buffer_speed;
+                        snprintf(buffer_speed, max_len_speed, "Speed %f ",
+                            playData->speedMult);
+                        gf2d_font_draw_line_tag(buffer_speed,FT_H1,gfc_color(1,1,1,1), vector2d(10,150));
 
-                if(plr->inStats == 1)
-                {
-                    gf2d_draw_rect_filled(gfc_rect(600, 10, 500, 500),gfc_color8(60,60,60,255));
-                    char buffer_stat[50];
-                    int max_len_stat = sizeof buffer_stat;
-                    snprintf(buffer_stat, max_len_stat, "Defense: %f",playData->defense);
+                        gf2d_draw_rect_filled(gfc_rect(10, 175, 300,32),gfc_color8(60,60,60,255));
+                        char buffer_mana[50];
+                        int max_len_mana = sizeof buffer_mana;
+                        snprintf(buffer_mana, max_len_mana, "Mana %d / %d",
+                            playData->currMana, playData->maxMana);
+                        gf2d_font_draw_line_tag(buffer_mana,FT_H1,gfc_color(1,1,1,1), vector2d(10,175));
 
-                    char buffer_stat2[50];
-                    int max_len_stat2 = sizeof buffer_stat2;
-                    snprintf(buffer_stat2, max_len_stat2, "Magic Mult: %f", playData->magicMult);
+                        gf2d_draw_rect_filled(gfc_rect(10, 200, 500,32),gfc_color8(60,60,60,255));
+                        char buffer_position[50];
+                        int max_len_position = sizeof buffer_position;
+                        Vector3D positionVect;
+                        positionVect = get_player_position();
+                        snprintf(buffer_position, max_len_position, "My Position: X: %f Y: %f Z: %f",
+                        positionVect.x, positionVect.y, positionVect.z);
+                        gf2d_font_draw_line_tag(buffer_position,FT_H1,gfc_color(1,1,1,1), vector2d(10,200));
 
-                    char buffer_stat3[50];
-                    int max_len_stat3 = sizeof buffer_stat3;
-                    snprintf(buffer_stat3, max_len_stat3, "Phys Mult: %f", playData->physicalMult);
+                        
 
-                    char buffer_stat4[50];
-                    int max_len_stat4 = sizeof buffer_stat4;
-                    snprintf(buffer_stat4, max_len_stat4, "Arrow Mult: %f", playData->arrowMult);
 
-                    char buffer_stat5[50];
-                    int max_len_stat5 = sizeof buffer_stat5;
-                    snprintf(buffer_stat5, max_len_stat5, "Arrow Count: %d / %d", playData->currArrow, playData->maxArrow);
+                        if(plr->inStats == 1)
+                        {
+                            gf2d_draw_rect_filled(gfc_rect(600, 10, 500, 500),gfc_color8(60,60,60,255));
+                            char buffer_stat[50];
+                            int max_len_stat = sizeof buffer_stat;
+                            snprintf(buffer_stat, max_len_stat, "Defense: %f",playData->defense);
 
-                    gf2d_font_draw_line_tag(buffer_stat,FT_H1,gfc_color(0,1,1,1), vector2d(600,10));
-                    gf2d_font_draw_line_tag(buffer_stat2,FT_H1,gfc_color(0,1,1,1), vector2d(600,30));
-                    gf2d_font_draw_line_tag(buffer_stat3,FT_H1,gfc_color(0,1,1,1), vector2d(600,50));
-                    gf2d_font_draw_line_tag(buffer_stat4,FT_H1,gfc_color(0,1,1,1), vector2d(600,70));
-                    gf2d_font_draw_line_tag(buffer_stat5,FT_H1,gfc_color(0,1,1,1), vector2d(600,90));
-                }
+                            char buffer_stat2[50];
+                            int max_len_stat2 = sizeof buffer_stat2;
+                            snprintf(buffer_stat2, max_len_stat2, "Magic Mult: %f", playData->magicMult);
 
-                gf2d_sprite_draw(playerFace, vector2d(1000, 10), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);
+                            char buffer_stat3[50];
+                            int max_len_stat3 = sizeof buffer_stat3;
+                            snprintf(buffer_stat3, max_len_stat3, "Phys Mult: %f", playData->physicalMult);
 
-                gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
+                            char buffer_stat4[50];
+                            int max_len_stat4 = sizeof buffer_stat4;
+                            snprintf(buffer_stat4, max_len_stat4, "Arrow Mult: %f", playData->arrowMult);
+
+                            char buffer_stat5[50];
+                            int max_len_stat5 = sizeof buffer_stat5;
+                            snprintf(buffer_stat5, max_len_stat5, "Arrow Count: %d / %d", playData->currArrow, playData->maxArrow);
+
+                            char buffer_stat6[50];
+                            int max_len_stat6 = sizeof buffer_stat6;
+                            snprintf(buffer_stat6, max_len_stat6, "Speed: %f", playData->speedMult);
+                            
+                            gf2d_sprite_draw(bootIco, vector2d(610, 10), vector2d(0.1,0.1), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);   
+                            gf2d_font_draw_line_tag(buffer_stat6,FT_H1,gfc_color(0,1,1,1), vector2d(650,10));
+
+                            gf2d_sprite_draw(swordIco, vector2d(610, 40), vector2d(0.1,0.1), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);   
+                            gf2d_font_draw_line_tag(buffer_stat3,FT_H1,gfc_color(0,1,1,1), vector2d(650,40));
+
+                            gf2d_sprite_draw(shieldIco, vector2d(610, 70), vector2d(0.1,0.1), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);   
+                            gf2d_font_draw_line_tag(buffer_stat,FT_H1,gfc_color(0,1,1,1), vector2d(650,70));
+
+                            gf2d_sprite_draw(wandIco, vector2d(610, 100), vector2d(0.1,0.1), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);   
+                            gf2d_font_draw_line_tag(buffer_stat2,FT_H1,gfc_color(0,1,1,1), vector2d(650,100));
+                            
+                            gf2d_sprite_draw(arrowIco, vector2d(610, 130), vector2d(0.1,0.1), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);   
+                            gf2d_font_draw_line_tag(buffer_stat5,FT_H1,gfc_color(0,1,1,1), vector2d(650,130));
+                                gf2d_font_draw_line_tag(buffer_stat4,FT_H1,gfc_color(0,1,1,1), vector2d(680,160));
+                            
+                        }
+                    if(plr->isBlocking == 1)
+                    {
+                        gf2d_sprite_draw(blockImage, vector2d(800, 300), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);    
+                    }
+
+                    gf2d_sprite_draw(playerFace, vector2d(1000, 10), vector2d(2,2), vector3d(8, 8, 0), gfc_color(1, 1, 1, 0.9), (Uint32)1);
+
+                    gf2d_sprite_draw(mouse,vector2d(mousex,mousey),vector2d(2,2),vector3d(8,8,0),gfc_color(0.3,.9,1,0.9),(Uint32)mouseFrame);
                 }
 
                 const Uint8 * keys;

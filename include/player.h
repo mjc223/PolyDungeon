@@ -41,4 +41,10 @@ void change_player_speed(float newMult);
 
 void set_player_data();
 
+Entity *plr_copy();
+
+void player_save();
+
+SJson* player_save_writer();
+
 #endif
